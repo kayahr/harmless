@@ -1,7 +1,6 @@
 ---
 title: Components
 children:
-    - ./components/function-components.md
     - ./components/class-components.md
     - ./components/rendering.md
     - ./components/reactive-content.md
@@ -118,7 +117,6 @@ function Numbers({ children }: { children?: number | number[] }) {
 
 ## More
 
-* [Function Components]
 * [Class Components]
 * [Rendering]
 * [Reactive Content]
@@ -134,7 +132,6 @@ function Numbers({ children }: { children?: number | number[] }) {
 [promises]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [observables]: https://github.com/tc39/proposal-observable
 [Class Components]: ./components/class-components.md
-[Function Components]: ./components/function-components.md
 [Rendering]: ./components/rendering.md
 [Reactive Content]: ./components/reactive-content.md
 [Component Lifecycles]: ./components/component-lifecycles.md
