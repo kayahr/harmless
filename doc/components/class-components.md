@@ -47,4 +47,4 @@ Providing an `onDestroy` method is equivalent to registering a callback with the
 
 [onDestroy]: https://kayahr.github.io/harmless/functions/_kayahr_harmless.onDestroy.html
 [Component Lifecycles]: ./component-lifecycles.md
-[Dependency Injection]: ./dependeny-injection.md
+[Dependency Injection]: ./dependency-injection.md
