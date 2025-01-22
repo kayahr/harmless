@@ -9,7 +9,8 @@
         "reactive",
         "framework",
         "typescript",
-        "harmless"
+        "harmless",
+        "jsx"
     ],
     "license": "MIT",
     "author": "Klaus Reimer <k@ailis.de>",
