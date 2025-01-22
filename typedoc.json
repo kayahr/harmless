@@ -1,0 +1,29 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "name": "Harmless",
+    "entryPoints": [
+        "src/main/index.ts"
+    ],
+    "basePath": "src/main",
+    "entryPointStrategy": "resolve",
+    "out": "lib/apidoc",
+    "projectDocuments": [
+        "doc/getting-started.md",
+        "doc/components.md",
+        "doc/control-flow.md",
+        "doc/signals.md",
+        "doc/css.md",
+        "doc/refs.md"
+    ],
+    "alwaysCreateEntryPointModule": true,
+    "excludePrivate": true,
+    "excludeExternals": true,
+    "excludeInternal": true,
+    "treatWarningsAsErrors": true,
+    "validation": true,
+    "plugin": [
+        "typedoc-github-theme"
+    ],
+    "disableSources": true,
+    "gitRevision": "main"
+}
