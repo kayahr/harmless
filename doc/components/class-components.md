@@ -21,7 +21,7 @@ export class Contact {
 }
 ```
 
-The Lifecycle of a class components is straight-forward: When component is rendered then an instance of the class is created and the `render` method is called immediately and only once.
+The lifecycle of a class component is straight-forward: When component is rendered then an instance of the class is created and the `render` method is called immediately and only once.
 
 When component is removed from the DOM then it is destroyed. The component is informed about the destruction by calling the optional `onDestroy` method:
 
