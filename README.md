@@ -44,4 +44,4 @@ Check out the [documentation].
 [ESM]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
 [If]: https://kayahr.github.io/harmless/documents/Control_Flow.If.html
 [Choose]: https://kayahr.github.io/harmless/documents/Control_Flow.Choose.html
-[Route]: https://kayahr.github.io/harmless/documents/Control_Flow.Routes.html
+[Route]: https://kayahr.github.io/harmless/documents/Control_Flow.Route.html
