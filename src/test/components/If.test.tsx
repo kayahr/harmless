@@ -69,7 +69,7 @@ describe("If", () => {
         value.set(1);
         expect(root.outerHTML).toBe("<body>children</body>");
     });
-    it("initializes shown components and destroys hidden components", () => {
+    it("initializes single shown component and destroys single hidden component", () => {
         const value = signal(0);
         const initThen = vi.fn();
         const destroyThen = vi.fn();
@@ -119,6 +119,93 @@ describe("If", () => {
         expect(destroyThen).toHaveBeenCalledOnce();
         expect(destroyElse).not.toHaveBeenCalled();
         expect(root.outerHTML).toBe("<body>else</body>");
+    });
+
+    it("initializes multiple shown components and destroys multiple hidden components", () => {
+        const value = signal(0);
+        const initThen1 = vi.fn();
+        const destroyThen1 = vi.fn();
+        const initThen2 = vi.fn();
+        const destroyThen2 = vi.fn();
+        const initElse1 = vi.fn();
+        const destroyElse1 = vi.fn();
+        const initElse2 = vi.fn();
+        const destroyElse2 = vi.fn();
+        function Then1() {
+            initThen1();
+            onDestroy(destroyThen1);
+            return "then1";
+        }
+        function Then2() {
+            initThen2();
+            onDestroy(destroyThen2);
+            return <>then2</>;
+        }
+        function Else1() {
+            initElse1();
+            onDestroy(destroyElse1);
+            return "else1";
+        }
+        function Else2() {
+            initElse2();
+            onDestroy(destroyElse2);
+            return <>else2</>;
+        }
+        const condition = <If test={() => value() === 0} then={<><Then1 /><Then2 /></>} else={<><Else1 /><Else2 /></>}></If>;
+        const root = document.createElement("body");
+        root.appendChild(render(condition));
+        expect(initThen1).toHaveBeenCalledOnce();
+        expect(initElse1).not.toHaveBeenCalled();
+        expect(destroyThen1).not.toHaveBeenCalled();
+        expect(destroyElse1).not.toHaveBeenCalled();
+        expect(initThen2).toHaveBeenCalledOnce();
+        expect(initElse2).not.toHaveBeenCalled();
+        expect(destroyThen2).not.toHaveBeenCalled();
+        expect(destroyElse2).not.toHaveBeenCalled();
+        expect(root.outerHTML).toBe("<body>then1then2</body>");
+        initThen1.mockClear();
+        initThen2.mockClear();
+
+        value.set(1);
+        expect(initThen1).not.toHaveBeenCalled();
+        expect(initElse1).toHaveBeenCalledOnce();
+        expect(destroyThen1).toHaveBeenCalledOnce();
+        expect(destroyElse1).not.toHaveBeenCalled();
+        expect(initThen2).not.toHaveBeenCalled();
+        expect(initElse2).toHaveBeenCalledOnce();
+        expect(destroyThen2).toHaveBeenCalledOnce();
+        expect(destroyElse2).not.toHaveBeenCalled();
+        expect(root.outerHTML).toBe("<body>else1else2</body>");
+        initElse1.mockClear();
+        destroyThen1.mockClear();
+        initElse2.mockClear();
+        destroyThen2.mockClear();
+
+        value.set(0);
+        expect(initThen1).toHaveBeenCalled();
+        expect(initElse1).not.toHaveBeenCalled();
+        expect(destroyThen1).not.toHaveBeenCalled();
+        expect(destroyElse1).toHaveBeenCalledOnce();
+        expect(initThen2).toHaveBeenCalled();
+        expect(initElse2).not.toHaveBeenCalled();
+        expect(destroyThen2).not.toHaveBeenCalled();
+        expect(destroyElse2).toHaveBeenCalledOnce();
+        expect(root.outerHTML).toBe("<body>then1then2</body>");
+        initThen1.mockClear();
+        destroyElse1.mockClear();
+        initThen2.mockClear();
+        destroyElse2.mockClear();
+
+        value.set(1);
+        expect(initThen1).not.toHaveBeenCalled();
+        expect(initElse1).toHaveBeenCalledOnce();
+        expect(destroyThen1).toHaveBeenCalledOnce();
+        expect(destroyElse1).not.toHaveBeenCalled();
+        expect(initThen2).not.toHaveBeenCalled();
+        expect(initElse2).toHaveBeenCalledOnce();
+        expect(destroyThen2).toHaveBeenCalledOnce();
+        expect(destroyElse2).not.toHaveBeenCalled();
+        expect(root.outerHTML).toBe("<body>else1else2</body>");
     });
 
     it("initializes shown async components and destroys hidden async components", async () => {

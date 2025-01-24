@@ -126,13 +126,15 @@ export class IntrinsicElement extends JSXElement<Node> {
 
     /** @inheritDoc */
     public doRender(): Node {
-        const element = document.createElement(this.#tag);
-        for (const [ key, value ] of Object.entries(this.#properties)) {
-            void this.#setAttributeValue(element, key, value);
-        }
-        for (const child of this.#children) {
-            element.appendChild(this.resolveNode(child));
-        }
-        return element;
+        return this.runInScope(() => {
+            const element = document.createElement(this.#tag);
+            for (const [ key, value ] of Object.entries(this.#properties)) {
+                void this.#setAttributeValue(element, key, value);
+            }
+            for (const child of this.#children) {
+                element.appendChild(this.resolveNode(child));
+            }
+            return element;
+        });
     }
 }

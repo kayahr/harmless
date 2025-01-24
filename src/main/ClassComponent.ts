@@ -71,29 +71,27 @@ export class ClassComponent<T extends ComponentConstructor<P, R>, P extends Prop
         if (context.has(this.source)) {
             // When DI context knows the component class then resolve it with dependency injection. During dependency resolving the signal scope
             // must be deactivated because otherwise signal created in dependencies are destroyed together with this component
-            this.scope?.deactivate();
+
+            // TODO Sure that this must not run within signal scope to allow registering signals in constructor?
             instance = context.get(this.source, [ this.#properties ]);
-            this.scope?.activate();
+            instance = context.get(this.source, [ this.#properties ]);
             if (instance instanceof Promise) {
                 // When resolved function is asynchronous because one of its dependencies is asynchronous then insert placeholder node
                 // and replace it later when promise is resolved
                 return instance.then(instance => {
-                    this.scope?.activate();
-                    try {
-                        // Render the now resolved element class in the signal scope of this function element
-                        return instance.render();
-                    } finally {
-                        this.scope?.deactivate();
-                    }
+                    // Render the now resolved element class in the signal scope of this function element
+                    return this.runInScope(() => instance.render());
                 }) as Promise<R>;
             }
         } else {
-            instance = new this.source(this.#properties);
+            instance = this.runInScope(() => new this.source(this.#properties));
         }
         // TODO Most likely not called in class component with asynchronous dependencies
-        if (instance.onDestroy != null) {
-            SignalScope.register({ destroy: instance.onDestroy });
-        }
-        return instance.render();
+        return this.runInScope(() => {
+            if (instance.onDestroy != null) {
+                SignalScope.registerDestroyable({ destroy: instance.onDestroy });
+            }
+            return instance.render();
+        });
     }
 }

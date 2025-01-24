@@ -63,6 +63,9 @@ export function getElement(node: JSXNode): JSXElement | null {
  * @param node - The node from which to read the JSX element to destroy.
  */
 export function destroyElement(node: JSXNode): void {
+    if (node instanceof JSXDocumentFragment) {
+        node.destroy();
+    }
     const element = getElement(node);
     if (element != null) {
         element.destroy();
@@ -136,6 +139,7 @@ export function replaceNode(oldNode: JSXNode, newNode: JSXNode): void {
         newNode[jsxFragment] = oldNode[jsxFragment];
         delete oldNode[jsxFragment];
         oldNode.parentNode?.replaceChild(newNode, oldNode);
+        destroyElement(oldNode);
     }
 }
 
@@ -159,8 +163,8 @@ export function removeNode(node: JSXNode): void {
     if (node instanceof JSXDocumentFragment) {
         node.remove();
     } else {
-        destroyElement(node);
         delete node[jsxFragment];
         node.parentNode?.removeChild(node);
+        destroyElement(node);
     }
 }

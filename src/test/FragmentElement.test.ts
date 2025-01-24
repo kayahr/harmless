@@ -9,7 +9,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Fragment, FragmentElement } from "../main/FragmentElement.js";
 import { JSXDocumentFragment, JSXDocumentFragmentEnd, JSXDocumentFragmentStart } from "../main/JSXDocumentFragment.js";
-import { removeNode, replaceNode } from "../main/JSXNode.js";
+import { appendChild, removeNode, replaceNode } from "../main/JSXNode.js";
 
 describe("FragmentElement", () => {
     it("returns a fragment element with the given children appended", () => {
@@ -203,7 +203,7 @@ describe("FragmentElement", () => {
             const childFrag = new FragmentElement(childFragSig);
             const parentFrag = new FragmentElement([ childFrag ]);
             const root = document.createElement("div");
-            root.appendChild(parentFrag.createNode());
+            appendChild(root, parentFrag.createNode());
             expect(root.outerHTML).toBe("<div>fragA</div>");
             level1Frag.set(fragB);
             expect(root.outerHTML).toBe("<div>fragB</div>");

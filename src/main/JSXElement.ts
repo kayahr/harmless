@@ -19,6 +19,9 @@ export abstract class JSXElement<T extends Element = Element> {
     /** The component scope (which is at the same time also the signal scope, so we borrow the functionality from there). */
     protected scope: SignalScope | null = null;
 
+    /** Flag indicating if element has been initialized and must be destroyed before initializing it again. */
+    #initialized = false;
+
     /**
      * Resolves a child from a promise. It creates a temporary empty text node which can be added to the DOM immediately. Then the promise is resolved
      * asynchronously to the real node which then replaces the temporary node.
@@ -106,6 +109,20 @@ export abstract class JSXElement<T extends Element = Element> {
     }
 
     /**
+     * Runs the given function within the elements signal scope which is created when not already present.
+     *
+     * @param fn - The function to run in the signal scope.
+     * @returns The function result.
+     */
+    protected runInScope<T>(fn: () => T): T {
+        if (this.scope == null) {
+            this.scope = new SignalScope();
+            SignalScope.registerDestroyable(this);
+        }
+        return this.scope.runInScope(fn);
+    }
+
+    /**
      * Renders this JSX element.
      *
      * @returns The created JSX element.
@@ -118,12 +135,8 @@ export abstract class JSXElement<T extends Element = Element> {
      * @returns The created JSX element.
      */
     public render(): T | Promise<T> {
-        this.scope = new SignalScope().activate();
-        try {
-            return this.doRender();
-        } finally {
-            this.scope.deactivate();
-        }
+        this.#init();
+        return this.doRender();
     }
 
     /**
@@ -141,12 +154,17 @@ export abstract class JSXElement<T extends Element = Element> {
 
     /** @inheritDoc */
     public createNode(): Node {
-        this.scope = new SignalScope().activate();
-        try {
-            return connectElement(this.resolveNode(this.doRender()), this);
-        } finally {
-            this.scope.deactivate();
+        this.#init();
+        const element = this.doRender();
+        const node = this.runInScope(() => this.resolveNode(element));
+        return connectElement(node, this);
+    }
+
+    #init() {
+        if (this.#initialized) {
+            this.destroy();
         }
+        this.#initialized = true;
     }
 
     /**
@@ -154,5 +172,7 @@ export abstract class JSXElement<T extends Element = Element> {
      */
     public destroy(): void {
         this.scope?.destroy();
+        this.scope = null;
+        this.#initialized = false;
     }
 }

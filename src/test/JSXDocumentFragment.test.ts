@@ -5,10 +5,12 @@
 
 import "@kayahr/vitest-matchers";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import { FragmentElement } from "../main/FragmentElement.js";
 import { JSXDocumentFragment, JSXDocumentFragmentEnd, JSXDocumentFragmentStart } from "../main/JSXDocumentFragment.js";
 import { getFragment } from "../main/JSXNode.js";
+import { ValueElement } from "../main/ValueElement.js";
 import { createFragment, dump, getFragments } from "./support.js";
 
 describe("JSXDocumentFragment", () => {
@@ -330,6 +332,44 @@ describe("JSXDocumentFragment", () => {
             root.lastChild?.remove();
             expect(() => fragment.replaceWith(document.createElement("div"))).toThrowWithMessage(
                 DOMException, "End anchor of fragment not found");
+        });
+    });
+    describe("destroy", () => {
+        it("does nothing when no children", () => {
+            const fragment = new JSXDocumentFragment();
+            expect(() => fragment.destroy()).not.toThrow();
+        });
+        it("destroys single child element", () => {
+            const fragment = new JSXDocumentFragment();
+            const element = new ValueElement("test");
+            const onDestroy = vi.spyOn(element, "destroy");
+            fragment.appendChild(element.createNode());
+            expect(onDestroy).not.toHaveBeenCalled();
+            fragment.destroy();
+            expect(onDestroy).toHaveBeenCalledOnce();
+        });
+        it("destroys multiple child elements", () => {
+            const fragment = new JSXDocumentFragment();
+            const element1 = new ValueElement("test");
+            const onDestroy1 = vi.spyOn(element1, "destroy");
+            const element2 = new ValueElement("test");
+            const onDestroy2 = vi.spyOn(element2, "destroy");
+            fragment.appendChild(element1.createNode());
+            fragment.appendChild(element2.createNode());
+            expect(onDestroy1).not.toHaveBeenCalled();
+            expect(onDestroy2).not.toHaveBeenCalled();
+            fragment.destroy();
+            expect(onDestroy1).toHaveBeenCalledOnce();
+            expect(onDestroy2).toHaveBeenCalledOnce();
+        });
+        it("destroys nested fragment", () => {
+            const fragment = new JSXDocumentFragment();
+            const element = new FragmentElement([]);
+            const onDestroy = vi.spyOn(element, "destroy");
+            fragment.appendChild(element.createNode());
+            expect(onDestroy).not.toHaveBeenCalled();
+            fragment.destroy();
+            expect(onDestroy).toHaveBeenCalledOnce();
         });
     });
 });

@@ -36,28 +36,21 @@ export class FunctionComponent<T extends ComponentFunction<P, R>, P extends Prop
         if (context.has(this.source)) {
             // When DI context knows the component function then resolve it with dependency injection. During dependency resolving the signal scope
             // must be deactivated because otherwise signal created in dependencies are destroyed together with this component
-            this.scope?.deactivate();
             const func = context.get(this.source);
-            this.scope?.activate();
             if (func instanceof Promise) {
                 // When resolved function is asynchronous because one of its dependencies is asynchronous then insert placeholder node
                 // and replace it later when promise is resolved
                 return func.then(func => {
-                    this.scope?.activate();
-                    try {
-                        // Render the now resolved component function in the signal scope of this function element
-                        return func(this.#properties);
-                    } finally {
-                        this.scope?.deactivate();
-                    }
+                    // Render the now resolved component function in the signal scope of this function element
+                    return this.runInScope(() => func(this.#properties));
                 }) as Promise<R>;
             } else {
                 // Component function was resolved synchronously, so call it synchronously
-                return func(this.#properties);
+                return this.runInScope(() => func(this.#properties));
             }
         } else {
             // No dependency injection is used, call component function normally
-            return this.source(this.#properties);
+            return this.runInScope(() => this.source(this.#properties));
         }
     }
 }

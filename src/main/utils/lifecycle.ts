@@ -13,5 +13,5 @@ import { SignalScope } from "@kayahr/signal";
  * @param destroy - The destroy handler function to register.
  */
 export function onDestroy(destroy: () => void): void {
-    SignalScope.register({ destroy });
+    SignalScope.registerDestroyable({ destroy });
 }

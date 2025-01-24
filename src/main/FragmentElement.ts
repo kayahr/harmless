@@ -28,14 +28,16 @@ export class FragmentElement extends JSXElement<JSXDocumentFragment> {
     protected doRender(): JSXDocumentFragment {
         const children = this.#children;
         const node = connectElement(new JSXDocumentFragment(), this);
-        if (children instanceof Array) {
-            for (const child of children) {
-                node.appendChild(this.resolveNode(child));
+        return this.runInScope(() => {
+            if (children instanceof Array) {
+                for (const child of children) {
+                    node.appendChild(this.resolveNode(child));
+                }
+            } else {
+                node.appendChild(this.resolveNode(children));
             }
-        } else {
-            node.appendChild(this.resolveNode(children));
-        }
-        return node;
+            return node;
+        });
     }
 }
 

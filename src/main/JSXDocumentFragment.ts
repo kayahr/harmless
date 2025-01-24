@@ -151,4 +151,24 @@ export class JSXDocumentFragment extends DocumentFragment {
         }
         destroyElement(this);
     }
+
+    /**
+     * Destroys the elements connected to the fragment child nodes.
+     */
+    public destroy(): void {
+        let node: Node | null = this.#startAnchor.nextSibling;
+        while (node != null && node != this.#endAnchor) {
+            let next = node.nextSibling;
+            if (node instanceof JSXDocumentFragmentStart) {
+                const fragment = getFragment(node);
+                if (fragment != null) {
+                    next = fragment.#endAnchor.nextSibling;
+                    destroyElement(fragment);
+                }
+            } else {
+                destroyElement(node);
+            }
+            node = next;
+        }
+    }
 }
