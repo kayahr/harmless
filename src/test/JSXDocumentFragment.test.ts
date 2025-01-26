@@ -288,6 +288,15 @@ describe("JSXDocumentFragment", () => {
     });
 
     describe("replaceWith", () => {
+        it("does nothing when replaced with itself", () => {
+            const root = document.createElement("body");
+            const fragment = new JSXDocumentFragment();
+            fragment.appendTo(root);
+            const onDestroy = vi.spyOn(fragment, "destroy");
+            fragment.replaceWith(fragment);
+            expect(onDestroy).not.toHaveBeenCalled();
+            expect(fragment.getParentNode()).toBe(root);
+        });
         it("replaces a fragment with a new node", () => {
             const root = document.createElement("body");
             const fragment = createFragment();

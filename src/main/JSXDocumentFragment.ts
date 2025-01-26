@@ -32,10 +32,17 @@ export class JSXDocumentFragment extends DocumentFragment {
     }
 
     /**
-     * @return True if document fragment is anchored into the DOM, false if not.
+     * @returns True if document fragment is anchored into the DOM, false if not.
      */
     public hasParentNode(): boolean {
         return this.#startAnchor.parentNode !== this;
+    }
+
+    /**
+     * @returns The parent node.
+     */
+    public getParentNode(): Node | null {
+        return this.#startAnchor.parentNode;
     }
 
     /**
@@ -138,6 +145,9 @@ export class JSXDocumentFragment extends DocumentFragment {
      * @param newNode - The node to replace this fragment with.
      */
     public replaceWith(newNode: Node): void {
+        if (newNode === this) {
+            return;
+        }
         if (this.hasParentNode()) {
             const parentFragment = this.getParentFragment();
             for (const oldNode of this.getChildNodes()) {

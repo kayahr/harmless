@@ -19,8 +19,11 @@ export abstract class JSXElement<T extends Element = Element> {
     /** The component scope (which is at the same time also the signal scope, so we borrow the functionality from there). */
     protected scope: SignalScope | null = null;
 
-    /** Flag indicating if element has been initialized and must be destroyed before initializing it again. */
-    #initialized = false;
+    /** Cached node created for this component. Null if not rendered yet. */
+    #node: Node | null = null;
+
+    /** Cached JSX element created for this component. Null if not created yet. */
+    #element: T | Promise<T> | null = null;
 
     /**
      * Resolves a child from a promise. It creates a temporary empty text node which can be added to the DOM immediately. Then the promise is resolved
@@ -135,8 +138,10 @@ export abstract class JSXElement<T extends Element = Element> {
      * @returns The created JSX element.
      */
     public render(): T | Promise<T> {
-        this.#init();
-        return this.doRender();
+        if (this.#element != null) {
+            return this.#element;
+        }
+        return this.#element = this.doRender();
     }
 
     /**
@@ -154,17 +159,12 @@ export abstract class JSXElement<T extends Element = Element> {
 
     /** @inheritDoc */
     public createNode(): Node {
-        this.#init();
-        const element = this.doRender();
-        const node = this.runInScope(() => this.resolveNode(element));
-        return connectElement(node, this);
-    }
-
-    #init() {
-        if (this.#initialized) {
-            this.destroy();
+        if (this.#node != null) {
+            return this.#node;
         }
-        this.#initialized = true;
+        const element = this.doRender();
+        const node = this.#node = this.runInScope(() => this.resolveNode(element));
+        return connectElement(node, this);
     }
 
     /**
@@ -173,6 +173,7 @@ export abstract class JSXElement<T extends Element = Element> {
     public destroy(): void {
         this.scope?.destroy();
         this.scope = null;
-        this.#initialized = false;
+        this.#element = null;
+        this.#node = null;
     }
 }

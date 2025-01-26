@@ -123,6 +123,10 @@ export function appendChild<T extends JSXNode>(parent: JSXNode, child: T): T {
  * @param newNode - The node to replace the old one with.
  */
 export function replaceNode(oldNode: JSXNode, newNode: JSXNode): void {
+    if (oldNode === newNode) {
+        return;
+    }
+
     // Call replace listeners once. The list of listeners is removed so it cannot be called again
     const listeners = oldNode[replaceListeners];
     if (listeners != null) {

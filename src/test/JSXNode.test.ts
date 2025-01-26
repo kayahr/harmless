@@ -119,6 +119,16 @@ describe("appendChild", () => {
 });
 
 describe("replaceNode", () => {
+    it("does nothing when replacing node with itself", () => {
+        const element = new IntrinsicElement("span", {}, []);
+        const node = element.createNode();
+        const root = document.createElement("body");
+        appendChild(root, node);
+        const onDestroy = vi.spyOn(element, "destroy");
+        replaceNode(node, node);
+        expect(onDestroy).not.toHaveBeenCalled();
+        expect(node.parentNode).toBe(root);
+    });
     it("does nothing when old DOM element has no parent", () => {
         const root = document.createElement("body");
         const div = document.createElement("div");
