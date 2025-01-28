@@ -11,7 +11,10 @@ import type { Element } from "../utils/types.js";
  * Properties for {@link For} component.
  */
 export interface ForProperties<T = unknown> {
+    /** The values to iterate over. Either a fixed array or a function returning an array (with dependency tracking) or a signal containing an array. */
     each: T[] | (() => T[]);
+
+    /** The children to render for each iterated value. */
     children: (item: T, index: CallableSignal<number>) => Element;
 }
 
