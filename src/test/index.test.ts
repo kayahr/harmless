@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { type ComponentClass } from "../main/ClassComponent.js";
 import { Choose, Otherwise, When, type WhenProperties } from "../main/components/Choose.js";
+import { For, type ForProperties } from "../main/components/For.js";
 import { Show, type ShowProperties } from "../main/components/Show.js";
 import * as exports from "../main/index.js";
 import { JSXElement } from "../main/JSXElement.js";
@@ -23,6 +24,7 @@ describe("index", () => {
             component,
             JSXElement,
             Show,
+            For,
             onDestroy,
             ref,
             Reference,
@@ -34,6 +36,7 @@ describe("index", () => {
 
         // Interfaces and types can only be checked by TypeScript
         ((): ShowProperties => (({} as exports.ShowProperties)))();
+        ((): ForProperties => (({} as exports.ForProperties)))();
         ((): ComponentOptions => (({} as exports.ComponentOptions)))();
         ((): WhenProperties => (({} as exports.WhenProperties)))();
         ((): ComponentClass => (({} as exports.ComponentClass)))();
