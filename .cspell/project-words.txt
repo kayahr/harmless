@@ -4,4 +4,8 @@ jsxs
 kayahr
 lifecycles
 multilines
+preloadicon
 Reimer
+runlots
+smallpad
+swaprows
