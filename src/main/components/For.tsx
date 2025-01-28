@@ -10,7 +10,7 @@ import type { Element } from "../utils/types.js";
 /**
  * Properties for {@link For} component.
  */
-export interface ForProperties<T> {
+export interface ForProperties<T = unknown> {
     each: T[] | (() => T[]);
     children: (item: T, index: CallableSignal<number>) => Element;
 }
