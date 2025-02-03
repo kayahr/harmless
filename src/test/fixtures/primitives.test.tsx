@@ -38,13 +38,14 @@ describe("fixture", () => {
                   <input id="undefined" value={undefined} />
                 </>
             );
-            expect(root.innerHTML).toBe(
-                  '<input id="string" value="string">'
+            expect(root.innerHTML).toBe("<!--<>-->"
+                + '<input id="string" value="string">'
                 + '<input id="number" value="123">'
                 + '<input id="true" value="">'
                 + '<input id="false">'
                 + '<input id="null">'
-                + '<input id="undefined">');
+                + '<input id="undefined">'
+                + "<!--</>-->");
         });
     });
 });

@@ -199,7 +199,7 @@ describe("IntrinsicElement", () => {
             let next = (value: string) => {};
             const observable = new Observable<string>(observer => { next = value => observer.next(value); });
             const node = new IntrinsicElement("div", {}, [ observable ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div></div>");
+            expect(node.outerHTML).toBe("<div><!----></div>");
             next("foo");
             expect(node.outerHTML).toBe("<div>foo</div>");
             next("bar");
@@ -215,18 +215,16 @@ describe("IntrinsicElement", () => {
             });
             const element = new IntrinsicElement("span", {}, [ observable ]);
             let node: HTMLElement | null = element.createNode() as HTMLElement;
-            expect(node.outerHTML).toEqual("<span></span>");
+            expect(node.outerHTML).toEqual("<span><!----></span>");
             observer?.next(1);
             expect(node.outerHTML).toEqual("<span>1</span>");
             await expect(new WeakRef(node)).toBeGarbageCollected(() => { element.destroy(); node = null; });
-            expect(observer).not.toBeNull();
-            observer?.next(2);
             expect(observer).toBeNull();
         });
         it("resolves promise child with empty text node which is replaced later with new node", async () => {
             const promise = new Promise<string>(resolve => setTimeout(() => resolve("foo"), 0));
             const node = new IntrinsicElement("div", {}, [ promise ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div></div>");
+            expect(node.outerHTML).toBe("<div><!----></div>");
             await promise;
             expect(node.outerHTML).toBe("<div>foo</div>");
         });
@@ -258,9 +256,9 @@ describe("IntrinsicElement", () => {
             const promise = new Promise<number>(resolveFunc => { resolve = resolveFunc; });
             const sig = signal(true);
             const node = new IntrinsicElement("div", {}, [ observable, ":", promise, ":", sig ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>::true</div>");
+            expect(node.outerHTML).toBe("<div><!---->:<!---->:true</div>");
             next("foo");
-            expect(node.outerHTML).toBe("<div>foo::true</div>");
+            expect(node.outerHTML).toBe("<div>foo:<!---->:true</div>");
             resolve(123);
             await promise;
             expect(node.outerHTML).toBe("<div>foo:123:true</div>");
@@ -295,29 +293,29 @@ describe("IntrinsicElement", () => {
         it("resolves JSX fragment child", () => {
             const child = new FragmentElement([ 123, " ", true ]);
             const node = new IntrinsicElement("div", {}, [ child ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>123 true</div>");
+            expect(node.innerHTML).toBe("<!--<>-->123 true<!--</>-->");
         });
         it("asynchronously resolves JSX fragment child from promise", async () => {
             const child = new Promise(resolve => setTimeout(() => resolve(new FragmentElement([ 123, " ", true ])), 0));
             const node = new IntrinsicElement("div", {}, [ child ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div></div>");
+            expect(node.innerHTML).toBe("<!---->");
             await child;
-            expect(node.outerHTML).toBe("<div>123 true</div>");
+            expect(node.innerHTML).toBe("<!--<>-->123 true<!--</>-->");
         });
         it("asynchronously resolves JSX fragment child from observable", () => {
             const child = signal(new FragmentElement([ 123, " ", true ]));
             const node = new IntrinsicElement("div", {}, [ child ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>123 true</div>");
+            expect(node.innerHTML).toBe("<!--<>-->123 true<!--</>-->");
             child.set(new FragmentElement([ false, " ", 5 ]));
-            expect(node.outerHTML).toBe("<div>false 5</div>");
+            expect(node.innerHTML).toBe("<!--<>-->false 5<!--</>-->");
         });
         it("recursively resolves array children to fragments", () => {
             const node = new IntrinsicElement("div", {}, [ [ 1, 2, [ 3, 4 ] ] ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>1234</div>");
+            expect(node.innerHTML).toBe("<!--<>-->12<!--<>-->34<!--</>--><!--</>-->");
         });
         it("resolves array with only one value", () => {
             const node = new IntrinsicElement("div", {}, [ [ 1 ], [ 2 ] ]).createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>12</div>");
+            expect(node.innerHTML).toBe("<!--<>-->1<!--</>--><!--<>-->2<!--</>-->");
         });
         it("writes element to a Reference ref", () => {
             const nodeRef = ref();

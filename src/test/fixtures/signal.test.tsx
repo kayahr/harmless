@@ -13,9 +13,9 @@ describe("fixture", () => {
         it("renders correctly as child", () => {
             const value = signal(1);
             const root = render(<>Value: {value}</>);
-            expect(root.innerHTML).toBe("Value: 1");
+            expect(root.innerHTML).toBe("<!--<>-->Value: 1<!--</>-->");
             value.set(2);
-            expect(root.innerHTML).toBe("Value: 2");
+            expect(root.innerHTML).toBe("<!--<>-->Value: 2<!--</>-->");
         });
         it("renders correctly as attribute", () => {
             const value = signal(1);

@@ -40,7 +40,7 @@ describe("FunctionComponent", () => {
             const element = new FunctionComponent(Component, {});
             const root = document.createElement("div");
             root.appendChild(element.createNode());
-            expect(root.innerHTML).toBe("");
+            expect(root.innerHTML).toBe("<!---->");
             await sleep(); // Wait a macro task to ensure all involved promises are settled
             expect(root.innerHTML).toBe("<span>Jane</span>");
         });

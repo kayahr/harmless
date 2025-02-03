@@ -42,15 +42,15 @@ export class FunctionComponent<T extends ComponentFunction<P, R>, P extends Prop
                 // and replace it later when promise is resolved
                 return func.then(func => {
                     // Render the now resolved component function in the signal scope of this function element
-                    return this.runInScope(() => func(this.#properties));
+                    return this.runInContext(() => func(this.#properties));
                 }) as Promise<R>;
             } else {
                 // Component function was resolved synchronously, so call it synchronously
-                return this.runInScope(() => func(this.#properties));
+                return this.runInContext(() => func(this.#properties));
             }
         } else {
             // No dependency injection is used, call component function normally
-            return this.runInScope(() => this.source(this.#properties));
+            return this.runInContext(() => this.source(this.#properties));
         }
     }
 }

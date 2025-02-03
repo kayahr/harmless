@@ -18,7 +18,7 @@ describe("Choose", () => {
         const choose = <Choose></Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body></body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
     });
     it("renders first <When> node that matches test expression", () => {
         const choose = <Choose>
@@ -29,7 +29,7 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
     });
     it("renders first <Otherwise> node when no <When> node matches test expression", () => {
         const choose = <Choose>
@@ -41,7 +41,7 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
     });
     it("renders <Otherwise> node when only child", () => {
         const choose = <Choose>
@@ -49,7 +49,7 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
     });
     it("dynamically switches content", () => {
         const value = signal(0);
@@ -61,13 +61,13 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         value.set(1);
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
         value.set(2);
-        expect(root.outerHTML).toBe("<body>C</body>");
+        expect(root.innerHTML).toBe("<!--<>-->C<!--</>-->");
         value.set(3);
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
     });
     it("initializes shown components and destroys hidden components", () => {
         const value = signal(0);
@@ -95,7 +95,7 @@ describe("Choose", () => {
         expect(initX).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyX).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
 
         value.set(1);
@@ -103,7 +103,7 @@ describe("Choose", () => {
         expect(initX).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyX).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
         initX.mockClear();
         destroyA.mockClear();
 
@@ -112,7 +112,7 @@ describe("Choose", () => {
         expect(initX).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyX).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
         destroyX.mockClear();
 
@@ -121,7 +121,7 @@ describe("Choose", () => {
         expect(initX).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyX).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
     });
 
     it("initializes shown async components and destroys hidden async components", async () => {
@@ -165,7 +165,7 @@ describe("Choose", () => {
         expect(initX).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyX).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
 
         value.set(1);
@@ -174,7 +174,7 @@ describe("Choose", () => {
         expect(initX).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyX).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
         initX.mockClear();
         destroyA.mockClear();
 
@@ -184,7 +184,7 @@ describe("Choose", () => {
         expect(initX).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyX).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
         destroyX.mockClear();
 
@@ -194,6 +194,6 @@ describe("Choose", () => {
         expect(initX).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyX).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>X</body>");
+        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
     });
 });

@@ -63,6 +63,6 @@
     "dependencies": {
         "@kayahr/cdi": "^0.2.0",
         "@kayahr/observable": "^1.1.4",
-        "@kayahr/signal": "^2.1.2"
+        "@kayahr/signal": "^3.0.0"
     }
 }

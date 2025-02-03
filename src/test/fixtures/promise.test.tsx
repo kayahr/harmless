@@ -12,9 +12,9 @@ describe("fixture", () => {
         it("renders correctly as child", async () => {
             const promise = new Promise(resolve => setTimeout(() => resolve(53), 0));
             const root = render(<>Value: {promise}</>);
-            expect(root.innerHTML).toBe("Value: ");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!----><!--</>-->");
             await promise;
-            expect(root.innerHTML).toBe("Value: 53");
+            expect(root.innerHTML).toBe("<!--<>-->Value: 53<!--</>-->");
         });
         it("renders correctly as attribute", async () => {
             const promise = new Promise(resolve => setTimeout(() => resolve(53), 0));

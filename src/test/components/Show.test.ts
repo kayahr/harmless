@@ -18,7 +18,7 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div>is true</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
     });
     it("renders nothing if condition is false and there is no fallback", () => {
         const element = Show({
@@ -28,7 +28,7 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div></div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--</>--></div>");
     });
     it("renders fallback if condition is false", () => {
         const element = Show({
@@ -39,15 +39,59 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div>is false</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
     });
-    describe("dynamically changes rendering when condition changes", () => {
+    describe("dynamically changes rendering with arrays when condition changes", () => {
+        const createTestValues = (condition: boolean) => ({
+            "sync array": [ "is ", condition ],
+            "async array": Promise.resolve([ "is ", condition ]),
+            "sync/async": [ "is ", Promise.resolve(condition) ]
+        });
+        const children = createTestValues(true);
+        const fallbacks = createTestValues(false);
+        for (const [ childName, child ] of Object.entries(children)) {
+            for (const [ fallbackName, fallback ] of Object.entries(fallbacks)) {
+                it(`with ${childName} child and ${fallbackName} fallback`, async () => {
+                    const wait = async () => {
+                        if (child instanceof Array) {
+                            await Promise.all(child);
+                        } else {
+                            await child;
+                        }
+                        if (fallback instanceof Array) {
+                            await Promise.all(fallback);
+                        } else {
+                            await fallback;
+                        }
+                    };
+                    const when = signal(true);
+                    const element = Show({
+                        when,
+                        children: child,
+                        fallback
+                    });
+                    const node = render(element);
+                    const root = document.createElement("div");
+                    root.appendChild(node);
+                    await wait();
+                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
+                    when.set(false);
+                    await wait();
+                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
+                    when.set(true);
+                    await wait();
+                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
+                    when.set(false);
+                    await wait();
+                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
+                });
+            }
+        }
+    });
+    describe("dynamically changes rendering with single values when condition changes", () => {
         const createTestValues = (condition: boolean) => ({
             "single sync": `is ${condition}`,
-            "sync array": [ "is ", condition ],
             "single async": Promise.resolve(`is ${condition}`),
-            "async array": Promise.resolve([ "is ", condition ]),
-            "sync/async": [ "is ", Promise.resolve(condition) ],
             signal: signal(`is ${condition}`),
             "async signal": Promise.resolve(signal(`is ${condition}`))
         });
@@ -78,16 +122,16 @@ describe("Show", () => {
                     const root = document.createElement("div");
                     root.appendChild(node);
                     await wait();
-                    expect(root.outerHTML).toBe("<div>is true</div>");
+                    expect(root.outerHTML).toBe("<div><!--<>-->is true<!--</>--></div>");
                     when.set(false);
                     await wait();
-                    expect(root.outerHTML).toBe("<div>is false</div>");
+                    expect(root.outerHTML).toBe("<div><!--<>-->is false<!--</>--></div>");
                     when.set(true);
                     await wait();
-                    expect(root.outerHTML).toBe("<div>is true</div>");
+                    expect(root.outerHTML).toBe("<div><!--<>-->is true<!--</>--></div>");
                     when.set(false);
                     await wait();
-                    expect(root.outerHTML).toBe("<div>is false</div>");
+                    expect(root.outerHTML).toBe("<div><!--<>-->is false<!--</>--></div>");
                 });
             }
         }
@@ -104,20 +148,20 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div>fallback</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->fallback<!--</>--></div>");
         fallback.set("FALLBACK");
-        expect(root.outerHTML).toBe("<div>FALLBACK</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->FALLBACK<!--</>--></div>");
         children.set("CONTENT");
-        expect(root.outerHTML).toBe("<div>FALLBACK</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->FALLBACK<!--</>--></div>");
         when.set(true);
-        expect(root.outerHTML).toBe("<div>CONTENT</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->CONTENT<!--</>--></div>");
         when.set(false);
-        expect(root.outerHTML).toBe("<div>FALLBACK</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->FALLBACK<!--</>--></div>");
         when.set(true);
-        expect(root.outerHTML).toBe("<div>CONTENT</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->CONTENT<!--</>--></div>");
         children.set("Content");
         fallback.set("Fallback");
-        expect(root.outerHTML).toBe("<div>Content</div>");
+        expect(root.outerHTML).toBe("<div><!--<>-->Content<!--</>--></div>");
     });
     it("dynamically switches nested Show components", () => {
         const childA1 = "Child A1";
@@ -132,14 +176,14 @@ describe("Show", () => {
         const rootShow = Show({ when: rootSwitch, children: showA, fallback: showB });
         const root = document.createElement("div");
         root.appendChild(render(rootShow));
-        expect(root.outerHTML).toBe("<div>Child A1</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child A1<!--</>--><!--</>--></div>");
         rootSwitch.set(false);
-        expect(root.outerHTML).toBe("<div>Child B1</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child B1<!--</>--><!--</>--></div>");
         switch1.set(false); // Should not affect the DOM yet because showA is not shown yet
-        expect(root.outerHTML).toBe("<div>Child B1</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child B1<!--</>--><!--</>--></div>");
         switch2.set(false);
-        expect(root.outerHTML).toBe("<div>Child B2</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child B2<!--</>--><!--</>--></div>");
         rootSwitch.set(true);
-        expect(root.outerHTML).toBe("<div>Child A2</div>");
+        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child A2<!--</>--><!--</>--></div>");
     });
 });

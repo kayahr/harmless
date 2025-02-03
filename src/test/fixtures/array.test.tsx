@@ -11,7 +11,7 @@ describe("fixture", () => {
     describe("array", () => {
         it("renders correctly", () => {
             const root = render(<div>{[ 1, " ", 3, ":", false, ":", null, [ "!", "!!" ] ]}</div>);
-            expect(root.innerHTML).toBe("<div>1 3:false:!!!</div>");
+            expect(root.innerHTML).toBe("<div>1 3:false:<!--<>-->!!!<!--</>--></div>");
         });
     });
 });

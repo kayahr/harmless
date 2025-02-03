@@ -3,9 +3,9 @@
  * See LICENSE.md for licensing information
  */
 
-import { SignalScope } from "@kayahr/signal";
 import { describe, expect, it, vi } from "vitest";
 
+import { Context } from "../../main/Context.js";
 import { onDestroy } from "../../main/utils/lifecycle.js";
 
 describe("onDestroy", () => {
@@ -13,8 +13,8 @@ describe("onDestroy", () => {
         expect(() => onDestroy(() => { throw Error("!"); })).not.toThrow();
     });
     it("registers a destroy handler on the current scope", () => {
-        const scope = new SignalScope();
-        const handler = scope.runInScope(() => {
+        const scope = new Context();
+        const handler = scope.runInContext(() => {
             const handler = vi.fn();
             onDestroy(handler);
             return handler;

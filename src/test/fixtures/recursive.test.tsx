@@ -15,17 +15,17 @@ describe("fixture", () => {
             const observable = new Observable<number | null>(observer => { next = v => observer.next(v); observer.next(-1); });
             const promise = new Promise(resolve => setTimeout(() => resolve(observable), 0));
             const root = render(<>{[ "Value: ", [ () => promise ] ]}</>);
-            expect(root.innerHTML).toBe("Value: ");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
             next(1);
-            expect(root.innerHTML).toBe("Value: ");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
             await promise;
-            expect(root.innerHTML).toBe("Value: -1");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>-->-1<!--</>--><!--</>-->");
             next(2);
-            expect(root.innerHTML).toBe("Value: 2");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>-->2<!--</>--><!--</>-->");
             next(3);
-            expect(root.innerHTML).toBe("Value: 3");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>-->3<!--</>--><!--</>-->");
             next(null);
-            expect(root.innerHTML).toBe("Value: ");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>--><!--</>--><!--</>-->");
         });
     });
     describe("recursive attributes", () => {

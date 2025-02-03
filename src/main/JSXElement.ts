@@ -4,11 +4,12 @@
  */
 
 import { isSubscribable, type Subscribable } from "@kayahr/observable";
-import { computed, SignalScope } from "@kayahr/signal";
+import { computed } from "@kayahr/signal";
 
-import { JSXDocumentFragment } from "./JSXDocumentFragment.js";
-import { addNodeReplaceListener, connectElement, destroyElement, getElement, replaceNode } from "./JSXNode.js";
-import { JSXPlaceholder } from "./JSXPlaceholder.js";
+import { Context } from "./Context.js";
+import { addNodeReplaceListener, connectElement, getElement, replaceNode } from "./JSXNode.js";
+import { PlaceholderNode } from "./PlaceholderNode.js";
+import { RangeFragment } from "./RangeFragment.js";
 import { Reference } from "./utils/Reference.js";
 import type { Element } from "./utils/types.js";
 
@@ -16,8 +17,8 @@ import type { Element } from "./utils/types.js";
  * Base class for JSX elements.
  */
 export abstract class JSXElement<T extends Element = Element> {
-    /** The component scope (which is at the same time also the signal scope, so we borrow the functionality from there). */
-    protected scope: SignalScope | null = null;
+    /** The component context. */
+    protected context: Context | null = null;
 
     /** Cached node created for this component. Null if not rendered yet. */
     #node: Node | null = null;
@@ -33,9 +34,10 @@ export abstract class JSXElement<T extends Element = Element> {
      * @returns Temporary empty text node which is replaced with the real node as soon as available.
      */
     protected resolveNodeFromPromise(source: Promise<unknown>): Node {
-        const node: Node = new JSXPlaceholder();
+        const context = new Context();
+        const node: Node = new PlaceholderNode();
         void source.then(source => {
-            const newNode = this.resolveNode(source);
+            const newNode = context.runInContext(() => this.resolveNode(source));
             connectElement(newNode, getElement(node));
             connectElement(node, null);
             replaceNode(node, newNode);
@@ -53,20 +55,18 @@ export abstract class JSXElement<T extends Element = Element> {
      * @returns Initial empty text node which is replaced with the first real node as soon as available and then updated every time a new value is emitted.
      */
     protected resolveNodeFromObservable(source: Subscribable): Node {
-        let nodeRef: WeakRef<Node> = new WeakRef(new JSXPlaceholder());
+        const context = new Context();
+        let node: Node = new PlaceholderNode();
         const subscription = source.subscribe(source => {
-            const node = nodeRef.deref();
-            if (node != null) {
-                const newNode = this.resolveNode(source);
-                addNodeReplaceListener(newNode, newNode => nodeRef = new WeakRef(newNode));
-                replaceNode(node, newNode);
-                destroyElement(node);
-                nodeRef = new WeakRef(newNode);
-            } else {
-                subscription.unsubscribe();
-            }
+            const newNode = context.runInContext(() => this.resolveNode(source));
+            addNodeReplaceListener(newNode, newNode => node = newNode);
+            replaceNode(node, newNode);
+            node = newNode;
         }, error => console.error(error));
-        return nodeRef.deref() as Node;
+        context.registerDestroyable({
+            destroy: () => subscription.unsubscribe()
+        });
+        return node;
     }
 
     /**
@@ -85,9 +85,6 @@ export abstract class JSXElement<T extends Element = Element> {
      * @returns The created node which can be inserted into the DOM.
      */
     protected resolveNode(source: unknown): Node {
-        if (source instanceof Reference) {
-            source = source.get();
-        }
         if (source == null) {
             return document.createTextNode("");
         } else if (source instanceof Node) {
@@ -95,17 +92,15 @@ export abstract class JSXElement<T extends Element = Element> {
         } else if (source instanceof JSXElement) {
             return source.createNode();
         } else if (source instanceof Array) {
-            const node = new JSXDocumentFragment();
-            for (const child of source) {
-                node.appendChild(this.resolveNode(child));
-            }
-            return node;
+            return new RangeFragment(source.map(source => this.resolveNode(source)));
         } else if (source instanceof Promise) {
             return this.resolveNodeFromPromise(source);
         } else if (isSubscribable(source)) {
             return this.resolveNodeFromObservable(source);
         } else if (source instanceof Function) {
             return this.resolveNode(computed(source as () => unknown));
+        } else if (source instanceof Reference) {
+            return this.resolveNode(source.get());
         } else {
             return document.createTextNode(String(source));
         }
@@ -117,12 +112,12 @@ export abstract class JSXElement<T extends Element = Element> {
      * @param fn - The function to run in the signal scope.
      * @returns The function result.
      */
-    protected runInScope<T>(fn: () => T): T {
-        if (this.scope == null) {
-            this.scope = new SignalScope();
-            SignalScope.registerDestroyable(this);
+    protected runInContext<T>(fn: () => T): T {
+        if (this.context == null) {
+            Context.getCurrent()?.registerDestroyable(this);
+            this.context = new Context();
         }
-        return this.scope.runInScope(fn);
+        return this.context.runInContext(fn);
     }
 
     /**
@@ -163,7 +158,7 @@ export abstract class JSXElement<T extends Element = Element> {
             return this.#node;
         }
         const element = this.doRender();
-        const node = this.#node = this.runInScope(() => this.resolveNode(element));
+        const node = this.#node = this.runInContext(() => this.resolveNode(element));
         return connectElement(node, this);
     }
 
@@ -171,8 +166,9 @@ export abstract class JSXElement<T extends Element = Element> {
      * Destroys the component scope and all its child scopes. Called when the connected HTML element has been removed from the DOM.
      */
     public destroy(): void {
-        this.scope?.destroy();
-        this.scope = null;
+        const context = this.context;
+        this.context = null;
+        context?.destroy();
         this.#element = null;
         this.#node = null;
     }

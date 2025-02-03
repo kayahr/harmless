@@ -3,8 +3,7 @@
  * See LICENSE.md for licensing information
  */
 
-import { JSXDocumentFragment, JSXDocumentFragmentEnd, JSXDocumentFragmentStart } from "../main/JSXDocumentFragment.js";
-import { getFragment } from "../main/JSXNode.js";
+import { RangeFragment, RangeFragmentEnd, RangeFragmentStart } from "../main/RangeFragment.js";
 
 /**
  * Dumps the given node into a string which can easily be compared in unit tests. Document fragments which were prepared for dumping with
@@ -14,34 +13,21 @@ import { getFragment } from "../main/JSXNode.js";
  * @returns The node dumped to a string.
  */
 export function dump(node: Node): string {
-    if (node instanceof JSXDocumentFragment) {
+    if (node instanceof RangeFragment) {
         return Array.from(node.childNodes).map(node => dump(node)).join("");
     } else {
-        const fragment = getFragment(node);
-        if (fragment != null) {
-            if (node instanceof JSXDocumentFragmentStart) {
-                return `<${fragment.toString()}>`;
-            } else if (node instanceof JSXDocumentFragmentEnd) {
-                return `</${fragment.toString()}>`;
-            }
+        if (node instanceof RangeFragmentStart) {
+            return `<${node.ownerFragment.toString()}>`;
+        }
+        if (node instanceof RangeFragmentEnd) {
+            return `</${node.ownerFragment.toString()}>`;
         }
         if (node instanceof Text) {
             return String(node.textContent);
-        } else {
-            const tagName = node.nodeName.toLowerCase();
-            return `<${tagName}>${Array.from(node.childNodes).map(node => dump(node)).join("")}</${tagName}>`;
         }
+        const tagName = node.nodeName.toLowerCase();
+        return `<${tagName}>${Array.from(node.childNodes).map(node => dump(node)).join("")}</${tagName}>`;
     }
-}
-
-/**
- * Helper function to return a list of owning document fragments.
- *
- * @param nodes - The list of nodes to check.
- * @returns Array with owning document fragments for each node or null if node is not part of a document fragment.
- */
-export function getFragments(nodes: NodeListOf<Node>): Array<JSXDocumentFragment | null> {
-    return Array.from(nodes).map(getFragment);
 }
 
 /**
@@ -51,8 +37,8 @@ export function getFragments(nodes: NodeListOf<Node>): Array<JSXDocumentFragment
  * @param name - Optional fragment name used in the start and end anchor tags of the fragment dump. Defaults to empty string.
  * @returns The created document fragments prepared for dumping.
  */
-export function createFragment(name: string = ""): JSXDocumentFragment {
-    const fragment = new JSXDocumentFragment();
+export function createFragment(name: string = ""): RangeFragment {
+    const fragment = new RangeFragment();
     fragment.toString = () => name;
     return fragment;
 }

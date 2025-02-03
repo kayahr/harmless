@@ -23,7 +23,7 @@ describe("fixture", () => {
                 <span>test</span>
                 <CompA a={53} b="test" />
             </CompB>);
-            expect(root.innerHTML).toBe('<div><span>test</span><span id="a">53</span><span id="b">test</span></div>');
+            expect(root.innerHTML).toBe('<div><span>test</span><!--<>--><span id="a">53</span><span id="b">test</span><!--</>--></div>');
         });
     });
 });

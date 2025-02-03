@@ -9,6 +9,7 @@ import { type ComponentClass } from "../main/ClassComponent.js";
 import { Choose, Otherwise, When, type WhenProperties } from "../main/components/Choose.js";
 import { For, type ForProperties } from "../main/components/For.js";
 import { Show, type ShowProperties } from "../main/components/Show.js";
+import { Context } from "../main/Context.js";
 import * as exports from "../main/index.js";
 import { JSXElement } from "../main/JSXElement.js";
 import { component, type ComponentOptions } from "../main/utils/component.js";
@@ -27,6 +28,7 @@ describe("index", () => {
             For,
             onDestroy,
             ref,
+            Context,
             Reference,
             render,
             When,

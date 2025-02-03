@@ -39,7 +39,11 @@ describe("fixture", () => {
                 <CompA a={1} key="key1" />
                 <CompB a={2} key="key2" />
             </>);
-            expect(root.innerHTML).toBe('<span id="a">1</span><span id="key">key1</span><div id="a">2</div><div id="key">key2</div>');
+            expect(root.innerHTML).toBe(
+                "<!--<>-->"
+                + '<!--<>--><span id="a">1</span><span id="key">key1</span><!--</>-->'
+                + '<!--<>--><div id="a">2</div><div id="key">key2</div><!--</>-->'
+                + "<!--</>-->");
         });
     });
 });

@@ -38,7 +38,7 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<Component />));
-        expect(root.innerHTML).toBe("53 John");
+        expect(root.innerHTML).toBe("<!--<>-->53 John<!--</>-->");
     });
 
     it("can be used as a function to set class component options", () => {
@@ -64,7 +64,7 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<Component />));
-        expect(root.innerHTML).toBe("53 John");
+        expect(root.innerHTML).toBe("<!--<>-->53 John<!--</>-->");
     });
 
     it("can be used as a function to set function component options", () => {
@@ -86,7 +86,7 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<Component />));
-        expect(root.innerHTML).toBe("53 John");
+        expect(root.innerHTML).toBe("<!--<>-->53 John<!--</>-->");
     });
 
     it("can inject async dependencies into function component", async () => {
@@ -112,10 +112,10 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<>:<Component />:</>));
-        expect(root.innerHTML).toBe("::");
+        expect(root.innerHTML).toBe("<!--<>-->:<!---->:<!--</>-->");
         await Context.getActive().getAsync(Service);
         await sleep(); // Wait a macro task to give promises time to settle
-        expect(root.innerHTML).toBe(":53 John:");
+        expect(root.innerHTML).toBe("<!--<>-->:<!--<>-->53 John<!--</>-->:<!--</>-->");
     });
 
     it("can inject async dependencies into class component", async () => {
@@ -145,10 +145,10 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<>:<Component />:</>));
-        expect(root.innerHTML).toBe("::");
+        expect(root.innerHTML).toBe("<!--<>-->:<!---->:<!--</>-->");
         await Context.getActive().getAsync(Service);
         await sleep(); // Wait a macro task to give promises time to settle
-        expect(root.innerHTML).toBe(":53 John:");
+        expect(root.innerHTML).toBe("<!--<>-->:<!--<>-->53 John<!--</>-->:<!--</>-->");
     });
 
     it("requires compatible inject array when used as a class decorator", () => {

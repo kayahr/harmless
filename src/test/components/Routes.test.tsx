@@ -17,7 +17,7 @@ describe("Routes", () => {
         const choose = <Routes></Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body></body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
     });
     it("renders first <Route> node that matches active path", () => {
         location.hash = "#/b";
@@ -31,7 +31,7 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
     });
     it("captures route parameters", () => {
         location.hash = "#/a/foo/bar";
@@ -44,7 +44,7 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>Foo: foo, Bar: bar</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->Foo: foo, Bar: bar<!--</>--><!--</>-->");
     });
     it("captures optional parameters", () => {
         location.hash = "#/a/foo";
@@ -57,9 +57,9 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>Foo: foo, Bar: </body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->Foo: foo, Bar: <!--</>--><!--</>-->");
         location.hash = "#/a/foo/bar";
-        expect(root.outerHTML).toBe("<body>Foo: foo, Bar: bar</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->Foo: foo, Bar: bar<!--</>--><!--</>-->");
     });
     it("dynamically switches routes", () => {
         location.hash = "#/";
@@ -73,13 +73,13 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.outerHTML).toBe("<body>Root</body>");
+        expect(root.innerHTML).toBe("<!--<>-->Root<!--</>-->");
         location.hash = "#/a";
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         location.hash = "#/b";
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
         location.hash = "#/";
-        expect(root.outerHTML).toBe("<body>Root</body>");
+        expect(root.innerHTML).toBe("<!--<>-->Root<!--</>-->");
     });
     it("initializes shown components and destroys hidden components", () => {
         const initA = vi.fn();
@@ -107,7 +107,7 @@ describe("Routes", () => {
         expect(initB).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyB).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
 
         location.hash = "#/b";
@@ -115,7 +115,7 @@ describe("Routes", () => {
         expect(initB).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyB).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
         initB.mockClear();
         destroyA.mockClear();
 
@@ -124,7 +124,7 @@ describe("Routes", () => {
         expect(initB).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyB).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
         destroyB.mockClear();
 
@@ -133,7 +133,7 @@ describe("Routes", () => {
         expect(initB).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyB).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
     });
 
     it("initializes shown async components and destroys hidden async components", async () => {
@@ -177,7 +177,7 @@ describe("Routes", () => {
         expect(initB).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyB).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
 
         location.hash = "#/b";
@@ -186,7 +186,7 @@ describe("Routes", () => {
         expect(initB).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyB).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
         initB.mockClear();
         destroyA.mockClear();
 
@@ -196,7 +196,7 @@ describe("Routes", () => {
         expect(initB).not.toHaveBeenCalled();
         expect(destroyA).not.toHaveBeenCalled();
         expect(destroyB).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>A</body>");
+        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
         initA.mockClear();
         destroyB.mockClear();
 
@@ -206,7 +206,7 @@ describe("Routes", () => {
         expect(initB).toHaveBeenCalledOnce();
         expect(destroyA).toHaveBeenCalledOnce();
         expect(destroyB).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>B</body>");
+        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
     });
     it("correctly handles switching between parameterized and non-parameterized routes", () => {
         const initRoot = vi.fn();
@@ -250,7 +250,7 @@ describe("Routes", () => {
 
         function test(path: string, expected: string, ...calls: Mock[]): void {
             location.hash = path;
-            expect(root.innerHTML).toBe(expected);
+            expect(root.innerHTML).toBe(`<!--<>-->${expected}<!--</>-->`);
             expect(initRoot).toHaveBeenCalledTimes(calls.includes(initRoot) ? 1 : 0);
             expect(initParamsA).toHaveBeenCalledTimes(calls.includes(initParamsA) ? 1 : 0);
             expect(initParamsB).toHaveBeenCalledTimes(calls.includes(initParamsB) ? 1 : 0);
@@ -259,15 +259,15 @@ describe("Routes", () => {
             expect(destroyParamsB).toHaveBeenCalledTimes(calls.includes(destroyParamsB) ? 1 : 0);
             calls.forEach(call => call.mockClear());
         }
-        test("#/", "Root", initRoot);
-        test("#/a/foo", "ParamsA: foo", destroyRoot, initParamsA);
-        test("#/a/bar", "ParamsA: bar");
-        test("#/b/foo", "ParamsB: foo", destroyParamsA, initParamsB);
-        test("#/", "Root", destroyParamsB, initRoot);
-        test("#/b/bar", "ParamsB: bar", destroyRoot, initParamsB);
+        test("#/", "<!--<>-->Root<!--</>-->", initRoot);
+        test("#/a/foo", "<!--<>-->ParamsA: foo<!--</>-->", destroyRoot, initParamsA);
+        test("#/a/bar", "<!--<>-->ParamsA: bar<!--</>-->");
+        test("#/b/foo", "<!--<>-->ParamsB: foo<!--</>-->", destroyParamsA, initParamsB);
+        test("#/", "<!--<>-->Root<!--</>-->", destroyParamsB, initRoot);
+        test("#/b/bar", "<!--<>-->ParamsB: bar<!--</>-->", destroyRoot, initParamsB);
         test("#/a", "A", destroyParamsB);
-        test("#/a/1", "ParamsA: 1", initParamsA);
+        test("#/a/1", "<!--<>-->ParamsA: 1<!--</>-->", initParamsA);
         test("#/a", "A", destroyParamsA);
-        test("#/a/2", "ParamsA: 2", initParamsA);
+        test("#/a/2", "<!--<>-->ParamsA: 2<!--</>-->", initParamsA);
     });
 });

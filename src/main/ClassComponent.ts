@@ -4,9 +4,9 @@
  */
 
 import { Context } from "@kayahr/cdi";
-import { SignalScope } from "@kayahr/signal";
 
 import { Component } from "./Component.js";
+import { Context as HarmlessContext } from "./Context.js";
 import type { Element, Properties } from "./utils/types.js";
 
 /**
@@ -74,22 +74,21 @@ export class ClassComponent<T extends ComponentConstructor<P, R>, P extends Prop
 
             // TODO Sure that this must not run within signal scope to allow registering signals in constructor?
             instance = context.get(this.source, [ this.#properties ]);
-            instance = context.get(this.source, [ this.#properties ]);
             if (instance instanceof Promise) {
                 // When resolved function is asynchronous because one of its dependencies is asynchronous then insert placeholder node
                 // and replace it later when promise is resolved
                 return instance.then(instance => {
                     // Render the now resolved element class in the signal scope of this function element
-                    return this.runInScope(() => instance.render());
+                    return this.runInContext(() => instance.render());
                 }) as Promise<R>;
             }
         } else {
-            instance = this.runInScope(() => new this.source(this.#properties));
+            instance = this.runInContext(() => new this.source(this.#properties));
         }
         // TODO Most likely not called in class component with asynchronous dependencies
-        return this.runInScope(() => {
+        return this.runInContext(() => {
             if (instance.onDestroy != null) {
-                SignalScope.registerDestroyable({ destroy: instance.onDestroy });
+                HarmlessContext.getCurrent()?.registerDestroyable({ destroy: instance.onDestroy });
             }
             return instance.render();
         });

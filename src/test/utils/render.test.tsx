@@ -37,7 +37,7 @@ describe("render", () => {
         const root = document.createElement("body");
         const node = render(test);
         root.appendChild(node);
-        expect(node).toBeInstanceOf(Text);
+        expect(node).toBeInstanceOf(Comment);
         expect(node.textContent).toBe("");
         await sleep();
         expect(root.innerHTML).toBe("test");

@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information.
  */
 
-import { SignalScope } from "@kayahr/signal";
+import { Context } from "../Context.js";
 
 /**
  * Registers a function in the current component scope which is called when component is destroyed. For function component this must be used within the
@@ -13,5 +13,5 @@ import { SignalScope } from "@kayahr/signal";
  * @param destroy - The destroy handler function to register.
  */
 export function onDestroy(destroy: () => void): void {
-    SignalScope.registerDestroyable({ destroy });
+    Context.getCurrent()?.registerDestroyable({ destroy });
 }

@@ -3,41 +3,31 @@
  * See LICENSE.md for licensing information.
  */
 
-import { JSXDocumentFragment } from "./JSXDocumentFragment.js";
 import { JSXElement } from "./JSXElement.js";
 import { connectElement } from "./JSXNode.js";
+import { RangeFragment } from "./RangeFragment.js";
+import type { Element } from "./utils/types.js";
 
 /**
  * JSX element for rendering a fragment.
  */
-export class FragmentElement extends JSXElement<JSXDocumentFragment> {
+export class FragmentElement extends JSXElement<RangeFragment> {
     /** The fragment children. */
-    readonly #children: unknown;
+    readonly #children: Element[];
 
     /**
      * Creates a new fragment element.
      *
      * @param children - The fragment children
      */
-    public constructor(children: unknown) {
+    public constructor(children: Element) {
         super();
-        this.#children = children;
+        this.#children = children instanceof Array ? children : [ children ];
     }
 
     /** @inheritDoc */
-    protected doRender(): JSXDocumentFragment {
-        const children = this.#children;
-        const node = connectElement(new JSXDocumentFragment(), this);
-        return this.runInScope(() => {
-            if (children instanceof Array) {
-                for (const child of children) {
-                    node.appendChild(this.resolveNode(child));
-                }
-            } else {
-                node.appendChild(this.resolveNode(children));
-            }
-            return node;
-        });
+    protected doRender(): RangeFragment {
+        return connectElement(this.runInContext(() => new RangeFragment(this.#children.map(child => this.resolveNode(child)))), this);
     }
 }
 
@@ -47,6 +37,6 @@ export class FragmentElement extends JSXElement<JSXDocumentFragment> {
  * @param children - The fragment children (or a single child).
  * @returns The created fragment element.
  */
-export function Fragment({ children }: { children: unknown }): FragmentElement {
+export function Fragment({ children }: { children: Element }): FragmentElement {
     return new FragmentElement(children);
 }

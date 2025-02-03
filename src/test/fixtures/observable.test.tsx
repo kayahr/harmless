@@ -14,11 +14,11 @@ describe("fixture", () => {
             let next = (value: number) => {};
             const observable = new Observable<number>(observer => { next = v => observer.next(v); });
             const root = render(<>Value: {observable}</>);
-            expect(root.innerHTML).toBe("Value: ");
+            expect(root.innerHTML).toBe("<!--<>-->Value: <!----><!--</>-->");
             next(1);
-            expect(root.innerHTML).toBe("Value: 1");
+            expect(root.innerHTML).toBe("<!--<>-->Value: 1<!--</>-->");
             next(2);
-            expect(root.innerHTML).toBe("Value: 2");
+            expect(root.innerHTML).toBe("<!--<>-->Value: 2<!--</>-->");
         });
         it("renders correctly as attribute", () => {
             let next = (value: number) => {};

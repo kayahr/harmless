@@ -16,7 +16,7 @@ describe("fixture", () => {
                 <h1><span ref={spanRef}>Text</span></h1>
                 <h2>{spanRef}</h2>
             </>);
-            expect(root.innerHTML).toBe("<h1></h1><h2><span>Text</span></h2>");
+            expect(root.innerHTML).toBe("<!--<>--><h1></h1><h2><span>Text</span></h2><!--</>-->");
         });
     });
 });

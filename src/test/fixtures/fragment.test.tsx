@@ -11,7 +11,7 @@ describe("fixture", () => {
     describe("fragment", () => {
         it("renders correctly", () => {
             const root = render(<>test {2}</>);
-            expect(root.innerHTML).toBe("test 2");
+            expect(root.innerHTML).toBe("<!--<>-->test 2<!--</>-->");
         });
     });
 });

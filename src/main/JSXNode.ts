@@ -3,17 +3,14 @@
  * See LICENSE.md for licensing information.
  */
 
-import { JSXDocumentFragment } from "./JSXDocumentFragment.js";
 import { type JSXElement } from "./JSXElement.js";
+import { RangeFragment } from "./RangeFragment.js";
 
 /** Function type for node replace listeners. */
 export type ReplaceListener = (newNode: Node) => void;
 
 /** Symbol used for connecting a JSX element to a DOM node. */
 const jsxElement = Symbol();
-
-/** Property symbol for holding reference to owner fragment. */
-const jsxFragment = Symbol();
 
 /** Property symbol used for list of node replace listeners. */
 const replaceListeners = Symbol();
@@ -24,9 +21,6 @@ const replaceListeners = Symbol();
 interface JSXNode extends Node {
     /** Optional JSX element connected to the node. Used to find the connected element to destroy it when node is removed from DOM. */
     [ jsxElement ]?: JSXElement;
-
-    /** The document fragment to which this node belongs. */
-    [ jsxFragment ]?: JSXDocumentFragment;
 
     /** Optional list of registered replacement listeners. */
     [ replaceListeners ]?: ReplaceListener[];
@@ -63,55 +57,13 @@ export function getElement(node: JSXNode): JSXElement | null {
  * @param node - The node from which to read the JSX element to destroy.
  */
 export function destroyElement(node: JSXNode): void {
-    if (node instanceof JSXDocumentFragment) {
+    if (node instanceof RangeFragment) {
         node.destroy();
     }
     const element = getElement(node);
     if (element != null) {
         element.destroy();
         delete node[jsxElement];
-    }
-}
-
-/**
- * Returns the document fragment which owns the given node.
- *
- * @param node - The node to check.
- * @returns The owning document fragment or null if none.
- */
-export function getFragment(node: JSXNode): JSXDocumentFragment | null {
-    return node[jsxFragment] ?? null;
-}
-
-/**
- * Sets or resets the owning fragment of the given node.
- *
- * @param node     - The node to modify.
- * @param fragment - The owning document fragment or null if none.
- * @returns The modified node.
- */
-export function setFragment<T extends JSXNode>(node: T, fragment: JSXDocumentFragment | null): T {
-    if (fragment == null) {
-        delete node[jsxFragment];
-    } else {
-        node[jsxFragment] = fragment;
-    }
-    return node;
-}
-
-/**
- * Appends the given child to the given parent. This helper function delegates the call to a document fragment if needed.
- *
- * @param parent - The parent node to append the node to.
- * @param child  - The child node to append.
- * @returns The appended child node.
- */
-export function appendChild<T extends JSXNode>(parent: JSXNode, child: T): T {
-    if (child instanceof JSXDocumentFragment) {
-        return child.appendTo(parent);
-    } else {
-        delete child[jsxFragment];
-        return parent.appendChild(child);
     }
 }
 
@@ -131,17 +83,15 @@ export function replaceNode(oldNode: JSXNode, newNode: JSXNode): void {
     const listeners = oldNode[replaceListeners];
     if (listeners != null) {
         delete oldNode[replaceListeners];
-        for (const listener of listeners) {
-            listener(newNode);
+        for (let i = 0, max = listeners.length; i < max; i++) {
+            listeners[i](newNode);
         }
     }
 
-     // Do the actual replacement. When old node is a JSXDocumentFragment then replacement must be passed through it to do some fragment magic
-    if (oldNode instanceof JSXDocumentFragment) {
+     // Do the actual replacement. When old node is a range fragment then replacement must be passed through it to do some fragment magic
+    if (oldNode instanceof RangeFragment) {
         oldNode.replaceWith(newNode);
     } else {
-        newNode[jsxFragment] = oldNode[jsxFragment];
-        delete oldNode[jsxFragment];
         oldNode.parentNode?.replaceChild(newNode, oldNode);
         destroyElement(oldNode);
     }
@@ -156,19 +106,4 @@ export function replaceNode(oldNode: JSXNode, newNode: JSXNode): void {
  */
 export function addNodeReplaceListener(node: JSXNode, listener: ReplaceListener): void {
     (node[replaceListeners] ??= []).push(listener);
-}
-
-/**
- * Removes the given node. Delegates the remove request to the document fragment if needed.
- *
- * @param node - The node to remove.
- */
-export function removeNode(node: JSXNode): void {
-    if (node instanceof JSXDocumentFragment) {
-        node.remove();
-    } else {
-        delete node[jsxFragment];
-        node.parentNode?.removeChild(node);
-        destroyElement(node);
-    }
 }

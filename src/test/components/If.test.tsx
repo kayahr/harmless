@@ -18,56 +18,56 @@ describe("If", () => {
         const condition = <If test={() => true}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body></body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
     });
     it("renders children when test expression returns true", () => {
         const condition = <If test={() => true}>{1}A</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body>1A</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->1A<!--</>--><!--</>-->");
     });
     it("does not render children when test expression returns false", () => {
         const condition = <If test={() => false}>{1}A</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body></body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
     });
     it("renders the `then` parameter when test expression returns true", () => {
         const condition = <If test={() => true} then={1}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body>1</body>");
+        expect(root.innerHTML).toBe("<!--<>-->1<!--</>-->");
     });
     it("renders the `then` parameter when test expression returns true and there is an else parameter", () => {
         const condition = <If test={() => true} then={1} else={2}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body>1</body>");
+        expect(root.innerHTML).toBe("<!--<>-->1<!--</>-->");
     });
     it("renders the `then` parameter when test expression returns true and ignores children", () => {
         const condition = <If test={() => true} then={1}>3</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body>1</body>");
+        expect(root.innerHTML).toBe("<!--<>-->1<!--</>-->");
     });
     it("renders the `else` parameter when test expression returns false", () => {
         const condition = <If test={() => false} then={1} else={2}>3</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body>2</body>");
+        expect(root.innerHTML).toBe("<!--<>-->2<!--</>-->");
     });
     it("dynamically switches content", () => {
         const value = signal(0);
         const condition = <If test={() => value() === 1} else="fallback">children</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.outerHTML).toBe("<body>fallback</body>");
+        expect(root.innerHTML).toBe("<!--<>-->fallback<!--</>-->");
         value.set(1);
-        expect(root.outerHTML).toBe("<body>children</body>");
+        expect(root.innerHTML).toBe("<!--<>-->children<!--</>-->");
         value.set(0);
-        expect(root.outerHTML).toBe("<body>fallback</body>");
+        expect(root.innerHTML).toBe("<!--<>-->fallback<!--</>-->");
         value.set(1);
-        expect(root.outerHTML).toBe("<body>children</body>");
+        expect(root.innerHTML).toBe("<!--<>-->children<!--</>-->");
     });
     it("initializes single shown component and destroys single hidden component", () => {
         const value = signal(0);
@@ -92,7 +92,7 @@ describe("If", () => {
         expect(initElse).not.toHaveBeenCalled();
         expect(destroyThen).not.toHaveBeenCalled();
         expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>then</body>");
+        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
         initThen.mockClear();
 
         value.set(1);
@@ -100,7 +100,7 @@ describe("If", () => {
         expect(initElse).toHaveBeenCalledOnce();
         expect(destroyThen).toHaveBeenCalledOnce();
         expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>else</body>");
+        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
         initElse.mockClear();
         destroyThen.mockClear();
 
@@ -109,7 +109,7 @@ describe("If", () => {
         expect(initElse).not.toHaveBeenCalled();
         expect(destroyThen).not.toHaveBeenCalled();
         expect(destroyElse).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>then</body>");
+        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
         initThen.mockClear();
         destroyElse.mockClear();
 
@@ -118,7 +118,7 @@ describe("If", () => {
         expect(initElse).toHaveBeenCalledOnce();
         expect(destroyThen).toHaveBeenCalledOnce();
         expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>else</body>");
+        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
     });
 
     it("initializes multiple shown components and destroys multiple hidden components", () => {
@@ -162,7 +162,7 @@ describe("If", () => {
         expect(initElse2).not.toHaveBeenCalled();
         expect(destroyThen2).not.toHaveBeenCalled();
         expect(destroyElse2).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>then1then2</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->then1<!--<>-->then2<!--</>--><!--</>--><!--</>-->");
         initThen1.mockClear();
         initThen2.mockClear();
 
@@ -175,7 +175,7 @@ describe("If", () => {
         expect(initElse2).toHaveBeenCalledOnce();
         expect(destroyThen2).toHaveBeenCalledOnce();
         expect(destroyElse2).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>else1else2</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->else1<!--<>-->else2<!--</>--><!--</>--><!--</>-->");
         initElse1.mockClear();
         destroyThen1.mockClear();
         initElse2.mockClear();
@@ -190,7 +190,7 @@ describe("If", () => {
         expect(initElse2).not.toHaveBeenCalled();
         expect(destroyThen2).not.toHaveBeenCalled();
         expect(destroyElse2).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>then1then2</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->then1<!--<>-->then2<!--</>--><!--</>--><!--</>-->");
         initThen1.mockClear();
         destroyElse1.mockClear();
         initThen2.mockClear();
@@ -205,7 +205,7 @@ describe("If", () => {
         expect(initElse2).toHaveBeenCalledOnce();
         expect(destroyThen2).toHaveBeenCalledOnce();
         expect(destroyElse2).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>else1else2</body>");
+        expect(root.innerHTML).toBe("<!--<>--><!--<>-->else1<!--<>-->else2<!--</>--><!--</>--><!--</>-->");
     });
 
     it("initializes shown async components and destroys hidden async components", async () => {
@@ -246,7 +246,7 @@ describe("If", () => {
         expect(initElse).not.toHaveBeenCalled();
         expect(destroyThen).not.toHaveBeenCalled();
         expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>then</body>");
+        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
         initThen.mockClear();
 
         value.set(1);
@@ -255,7 +255,7 @@ describe("If", () => {
         expect(initElse).toHaveBeenCalledOnce();
         expect(destroyThen).toHaveBeenCalledOnce();
         expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>else</body>");
+        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
         initElse.mockClear();
         destroyThen.mockClear();
 
@@ -265,7 +265,7 @@ describe("If", () => {
         expect(initElse).not.toHaveBeenCalled();
         expect(destroyThen).not.toHaveBeenCalled();
         expect(destroyElse).toHaveBeenCalledOnce();
-        expect(root.outerHTML).toBe("<body>then</body>");
+        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
         initThen.mockClear();
         destroyElse.mockClear();
 
@@ -275,6 +275,6 @@ describe("If", () => {
         expect(initElse).toHaveBeenCalledOnce();
         expect(destroyThen).toHaveBeenCalledOnce();
         expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.outerHTML).toBe("<body>else</body>");
+        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
     });
 });

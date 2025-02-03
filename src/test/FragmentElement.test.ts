@@ -8,8 +8,8 @@ import { signal } from "@kayahr/signal";
 import { describe, expect, it, vi } from "vitest";
 
 import { Fragment, FragmentElement } from "../main/FragmentElement.js";
-import { JSXDocumentFragment, JSXDocumentFragmentEnd, JSXDocumentFragmentStart } from "../main/JSXDocumentFragment.js";
-import { appendChild, removeNode, replaceNode } from "../main/JSXNode.js";
+import { replaceNode } from "../main/JSXNode.js";
+import { RangeFragment, RangeFragmentEnd, RangeFragmentStart } from "../main/RangeFragment.js";
 
 describe("FragmentElement", () => {
     it("returns a fragment element with the given children appended", () => {
@@ -18,15 +18,8 @@ describe("FragmentElement", () => {
         const element = Fragment({ children: [ child1, child2 ] });
         expect(element).toBeInstanceOf(FragmentElement);
         const node = element.createNode();
-        expect(node).toBeInstanceOf(JSXDocumentFragment);
-        expect(Array.from(node.childNodes)).toEqual([ expect.any(JSXDocumentFragmentStart), child1, child2, expect.any(JSXDocumentFragmentEnd) ]);
-    });
-    it("is destroyed when removed", () => {
-        const element = Fragment({ children: [] });
-        const onDestroy = vi.spyOn(element, "destroy");
-        const node = element.createNode();
-        removeNode(node);
-        expect(onDestroy).toHaveBeenCalledOnce();
+        expect(node).toBeInstanceOf(RangeFragment);
+        expect(Array.from(node.childNodes)).toEqual([ expect.any(RangeFragmentStart), child1, child2, expect.any(RangeFragmentEnd) ]);
     });
     it("is destroyed when replaced", () => {
         const element = Fragment({ children: [] });
@@ -41,68 +34,68 @@ describe("FragmentElement", () => {
             const child2 = document.createTextNode("test");
             const element = new FragmentElement([ child1, child2 ]);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
-            expect(Array.from(node.childNodes)).toEqual([ expect.any(JSXDocumentFragmentStart), child1, child2, expect.any(JSXDocumentFragmentEnd) ]);
+            expect(node).toBeInstanceOf(RangeFragment);
+            expect(Array.from(node.childNodes)).toEqual([ expect.any(RangeFragmentStart), child1, child2, expect.any(RangeFragmentEnd) ]);
         });
         it("returns fragment with one child if single node was specified instead of array", () => {
             const child = document.createElement("div");
             const element = new FragmentElement(child);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
-            expect(Array.from(node.childNodes)).toEqual([ expect.any(JSXDocumentFragmentStart), child, expect.any(JSXDocumentFragmentEnd) ]);
+            expect(node).toBeInstanceOf(RangeFragment);
+            expect(Array.from(node.childNodes)).toEqual([ expect.any(RangeFragmentStart), child, expect.any(RangeFragmentEnd) ]);
         });
         it("returns fragment with one child if there is only one node in the children array", () => {
             const child = document.createElement("div");
             const element = new FragmentElement([ child ]);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
-            expect(Array.from(node.childNodes)).toEqual([ expect.any(JSXDocumentFragmentStart), child, expect.any(JSXDocumentFragmentEnd) ]);
+            expect(node).toBeInstanceOf(RangeFragment);
+            expect(Array.from(node.childNodes)).toEqual([ expect.any(RangeFragmentStart), child, expect.any(RangeFragmentEnd) ]);
         });
         it("returns an empty fragment when there are no children", () => {
             const element = new FragmentElement([]);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
-            expect(Array.from(node.childNodes)).toEqual([ expect.any(JSXDocumentFragmentStart), expect.any(JSXDocumentFragmentEnd) ]);
+            expect(node).toBeInstanceOf(RangeFragment);
+            expect(Array.from(node.childNodes)).toEqual([ expect.any(RangeFragmentStart), expect.any(RangeFragmentEnd) ]);
         });
         it("resolves single null child to empty text node", () => {
             const element = new FragmentElement(null);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(node.childNodes.length).toBe(3);
             expect(node.childNodes[1]).toEqual(document.createTextNode(""));
         });
         it("resolves single undefined child to empty text node", () => {
             const element = new FragmentElement(undefined);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(node.childNodes.length).toBe(3);
             expect(node.childNodes[1]).toEqual(document.createTextNode(""));
         });
         it("resolves single string child to text node", () => {
             const element = new FragmentElement("test");
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(node.childNodes.length).toBe(3);
             expect(node.childNodes[1]).toEqual(document.createTextNode("test"));
         });
         it("resolves single number child to text node", () => {
             const element = new FragmentElement(53);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(node.childNodes.length).toBe(3);
             expect(node.childNodes[1]).toEqual(document.createTextNode("53"));
         });
         it("resolves single boolean 'true' child to text node", () => {
             const element = new FragmentElement(true);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(node.childNodes.length).toBe(3);
             expect(node.childNodes[1]).toEqual(document.createTextNode("true"));
         });
         it("resolves single boolean 'false' child to text node", () => {
             const element = new FragmentElement(false);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(node.childNodes.length).toBe(3);
             expect(node.childNodes[1]).toEqual(document.createTextNode("false"));
         });
@@ -113,11 +106,11 @@ describe("FragmentElement", () => {
             const node = element.createNode();
             const root = document.createElement("div");
             root.appendChild(node);
-            expect(root.outerHTML).toBe("<div></div>");
+            expect(root.innerHTML).toBe("<!--<>--><!----><!--</>-->");
             next("foo");
-            expect(root.outerHTML).toBe("<div>foo</div>");
+            expect(root.innerHTML).toBe("<!--<>-->foo<!--</>-->");
             next("bar");
-            expect(root.outerHTML).toBe("<div>bar</div>");
+            expect(root.innerHTML).toBe("<!--<>-->bar<!--</>-->");
         });
         it("resolves single promise child with empty text node which is replaced later with new node", async () => {
             let resolve = (value: string) => {};
@@ -126,10 +119,10 @@ describe("FragmentElement", () => {
             const node = element.createNode();
             const root = document.createElement("div");
             root.appendChild(node);
-            expect(root.outerHTML).toBe("<div></div>");
+            expect(root.innerHTML).toBe("<!--<>--><!----><!--</>-->");
             resolve("foo");
             await promise;
-            expect(root.outerHTML).toBe("<div>foo</div>");
+            expect(root.innerHTML).toBe("<!--<>-->foo<!--</>-->");
         });
         it("resolves single signal child with text node with initial value and replaces it later with new node", () => {
             const sig = signal(123);
@@ -137,25 +130,25 @@ describe("FragmentElement", () => {
             const node = element.createNode();
             const root = document.createElement("div");
             root.appendChild(node);
-            expect(root.outerHTML).toBe("<div>123</div>");
+            expect(root.innerHTML).toBe("<!--<>-->123<!--</>-->");
             sig.set(234);
-            expect(root.outerHTML).toBe("<div>234</div>");
+            expect(root.innerHTML).toBe("<!--<>-->234<!--</>-->");
             sig.set(345);
-            expect(root.outerHTML).toBe("<div>345</div>");
+            expect(root.innerHTML).toBe("<!--<>-->345<!--</>-->");
         });
         it("resolves synchronous children correctly", () => {
             const element = new FragmentElement([ null, undefined, "test", 23, true, false ]);
             const node = element.createNode();
-            expect(node).toBeInstanceOf(JSXDocumentFragment);
+            expect(node).toBeInstanceOf(RangeFragment);
             expect(Array.from(node.childNodes)).toEqual([
-                expect.any(JSXDocumentFragmentStart),
+                expect.any(RangeFragmentStart),
                 document.createTextNode(""),
                 document.createTextNode(""),
                 document.createTextNode("test"),
                 document.createTextNode("23"),
                 document.createTextNode("true"),
                 document.createTextNode("false"),
-                expect.any(JSXDocumentFragmentEnd)
+                expect.any(RangeFragmentEnd)
             ]);
         });
         it("resolves asynchronous children correctly", async () => {
@@ -168,14 +161,14 @@ describe("FragmentElement", () => {
             const node = element.createNode();
             const root = document.createElement("div");
             root.appendChild(node);
-            expect(root.outerHTML).toBe("<div>::true</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!---->:<!---->:true<!--</>-->");
             next("foo");
-            expect(root.outerHTML).toBe("<div>foo::true</div>");
+            expect(root.innerHTML).toBe("<!--<>-->foo:<!---->:true<!--</>-->");
             resolve(123);
             await promise;
-            expect(root.outerHTML).toBe("<div>foo:123:true</div>");
+            expect(root.innerHTML).toBe("<!--<>-->foo:123:true<!--</>-->");
             sig.set(false);
-            expect(root.outerHTML).toBe("<div>foo:123:false</div>");
+            expect(root.innerHTML).toBe("<!--<>-->foo:123:false<!--</>-->");
         });
         it("works with nested dynamic fragments switched by signal", () => {
             const fragA = new FragmentElement([ "fragA" ]);
@@ -184,13 +177,13 @@ describe("FragmentElement", () => {
             const parentFrag = new FragmentElement([ childFrag ]);
             const root = document.createElement("div");
             root.appendChild(parentFrag.createNode());
-            expect(root.outerHTML).toBe("<div>fragA</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>-->fragA<!--</>--><!--</>-->");
             childFrag.set(fragB);
-            expect(root.outerHTML).toBe("<div>fragB</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>-->fragB<!--</>--><!--</>-->");
             childFrag.set(fragA);
-            expect(root.outerHTML).toBe("<div>fragA</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>-->fragA<!--</>--><!--</>-->");
             childFrag.set(fragB);
-            expect(root.outerHTML).toBe("<div>fragB</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>-->fragB<!--</>--><!--</>-->");
         });
         it("works with two-level nested dynamic fragments switched by signal", () => {
             const fragA = new FragmentElement([ "fragA" ]);
@@ -203,18 +196,18 @@ describe("FragmentElement", () => {
             const childFrag = new FragmentElement(childFragSig);
             const parentFrag = new FragmentElement([ childFrag ]);
             const root = document.createElement("div");
-            appendChild(root, parentFrag.createNode());
-            expect(root.outerHTML).toBe("<div>fragA</div>");
+            root.appendChild(parentFrag.createNode());
+            expect(root.innerHTML).toBe("<!--<>--><!--<>--><!--<>-->fragA<!--</>--><!--</>--><!--</>-->");
             level1Frag.set(fragB);
-            expect(root.outerHTML).toBe("<div>fragB</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>--><!--<>-->fragB<!--</>--><!--</>--><!--</>-->");
             childFragSig.set(level2Frag);
-            expect(root.outerHTML).toBe("<div>fragC</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>--><!--<>-->fragC<!--</>--><!--</>--><!--</>-->");
             level2Frag.set(fragD);
-            expect(root.outerHTML).toBe("<div>fragD</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>--><!--<>-->fragD<!--</>--><!--</>--><!--</>-->");
             level1Frag.set(fragA);
-            expect(root.outerHTML).toBe("<div>fragD</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>--><!--<>-->fragD<!--</>--><!--</>--><!--</>-->");
             childFragSig.set(level1Frag);
-            expect(root.outerHTML).toBe("<div>fragA</div>");
+            expect(root.innerHTML).toBe("<!--<>--><!--<>--><!--<>-->fragA<!--</>--><!--</>--><!--</>-->");
         });
     });
 });

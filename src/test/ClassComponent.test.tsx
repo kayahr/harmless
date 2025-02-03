@@ -73,7 +73,7 @@ describe("ClassComponent", () => {
             const element = new ClassComponent(Component, { a: 2 });
             const root = document.createElement("div");
             root.appendChild(element.createNode());
-            expect(root.innerHTML).toBe("");
+            expect(root.innerHTML).toBe("<!---->");
             await sleep(); // Wait a macro task to ensure all involved promises are settled
             expect(root.innerHTML).toBe("<div>Jane 2</div>");
         });
