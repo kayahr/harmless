@@ -8,7 +8,7 @@ import { component } from "../../main/utils/component.js";
 import { render } from "../../main/utils/render.js";
 
 function User(props: unknown, params: RouteParams<{ id: string }>) {
-    return <div>User {() => params().id}</div>;
+    return <div>User {() => params.get().id}</div>;
 }
 component(User, { inject: [ RouteParams ] });
 

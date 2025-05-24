@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information
  */
 
-import { type CallableSignal, computed, signal, type WritableSignal } from "@kayahr/signal";
+import { computed, type Signal, signal, type SignalSource, toSignal, type WritableSignal } from "@kayahr/signal";
 
 import type { Element } from "../utils/types.js";
 
@@ -12,10 +12,10 @@ import type { Element } from "../utils/types.js";
  */
 export interface ForProperties<T = unknown> {
     /** The values to iterate over. Either a fixed array or a function returning an array (with dependency tracking) or a signal containing an array. */
-    each: readonly T[] | (() => readonly T[]);
+    each: readonly T[] | SignalSource<readonly T[]>;
 
     /** The children to render for each iterated value. */
-    children: (item: T, index: CallableSignal<number>) => Element;
+    children: (item: T, index: Signal<number>) => Element;
 }
 
 class CacheStack<K, V> {
@@ -46,9 +46,9 @@ class CacheStack<K, V> {
 export function For<T>({ each, children }: ForProperties<T>): Element {
     let cache = new CacheStack<unknown, { element: Element, indexSignal: WritableSignal<number> }>();
     let oldCache: typeof cache | null = cache;
-    const getItems = each instanceof Array ? () => each : each;
+    const source = each instanceof Array ? signal(each) : toSignal(each);
     const items = computed(() => {
-        return getItems().map((item, index, items) => {
+        return source.get()?.map((item, index, items) => {
             if (index === 0) {
                 // Swap cache on first element for automatic cleanup
                 oldCache = cache;

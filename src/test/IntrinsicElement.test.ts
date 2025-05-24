@@ -150,7 +150,7 @@ describe("IntrinsicElement", () => {
         });
         it("can dynamically set style attribute", () => {
             const color = signal("red");
-            const node = new IntrinsicElement("div", { style: () => ({ color: color(), "font-size": "12px" }) }, []).createNode() as HTMLDivElement;
+            const node = new IntrinsicElement("div", { style: () => ({ color: color.get(), "font-size": "12px" }) }, []).createNode() as HTMLDivElement;
             expect(node.outerHTML).toBe('<div style="color: red; font-size: 12px"></div>');
             color.set("blue");
             expect(node.outerHTML).toBe('<div style="color: blue; font-size: 12px"></div>');
@@ -279,7 +279,7 @@ describe("IntrinsicElement", () => {
         });
         it("tracks signals dependencies in function children", () => {
             const value = signal(1);
-            const func = () => value() * 2;
+            const func = () => value.get() * 2;
             const node = new IntrinsicElement("span", {}, [ func ]).createNode() as HTMLElement;
             expect(node.outerHTML).toBe("<span>2</span>");
             value.set(2);

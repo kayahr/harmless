@@ -176,13 +176,13 @@ describe("ClassComponent", () => {
             public constructor(props: {}, public dep: Dep) {}
 
             public render() {
-                return <>{() => this.dep.value()}</>;
+                return <>{() => this.dep.value.get()}</>;
             }
         }
         component(Component, { inject: [ Dep ] });
         const element = new ClassComponent(Component, {});
         element.createNode();
         element.destroy();
-        expect(Context.getActive().getSync(Dep).value()).toBe(3);
+        expect(Context.getActive().getSync(Dep).value.get()).toBe(3);
     });
 });

@@ -110,12 +110,12 @@ describe("FunctionComponent", () => {
         }
         Context.getActive().setClass(Dep);
         function Component(props: {}, dep: Dep) {
-            return <>{() => dep.value()}</>;
+            return <>{() => dep.value.get()}</>;
         }
         component(Component, { inject: [ Dep ] });
         const element = new FunctionComponent(Component, {});
         element.createNode();
         element.destroy();
-        expect(Context.getActive().getSync(Dep).value()).toBe(3);
+        expect(Context.getActive().getSync(Dep).value.get()).toBe(3);
     });
 });

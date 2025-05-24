@@ -58,7 +58,7 @@ describe("If", () => {
     });
     it("dynamically switches content", () => {
         const value = signal(0);
-        const condition = <If test={() => value() === 1} else="fallback">children</If>;
+        const condition = <If test={() => value.get() === 1} else="fallback">children</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
         expect(root.innerHTML).toBe("<!--<>-->fallback<!--</>-->");
@@ -85,7 +85,7 @@ describe("If", () => {
             onDestroy(destroyElse);
             return "else";
         }
-        const condition = <If test={() => value() === 0} then={<Then />} else={<Else />}></If>;
+        const condition = <If test={() => value.get() === 0} then={<Then />} else={<Else />}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
         expect(initThen).toHaveBeenCalledOnce();
@@ -151,7 +151,7 @@ describe("If", () => {
             onDestroy(destroyElse2);
             return <>else2</>;
         }
-        const condition = <If test={() => value() === 0} then={<><Then1 /><Then2 /></>} else={<><Else1 /><Else2 /></>}></If>;
+        const condition = <If test={() => value.get() === 0} then={<><Then1 /><Then2 /></>} else={<><Else1 /><Else2 /></>}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
         expect(initThen1).toHaveBeenCalledOnce();
@@ -238,7 +238,7 @@ describe("If", () => {
             return "else";
         }
         component(Else, { inject: [ DepX ] });
-        const condition = <If test={() => value() === 0} then={<Then />} else={<Else />}></If>;
+        const condition = <If test={() => value.get() === 0} then={<Then />} else={<Else />}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
         await sleep(0);

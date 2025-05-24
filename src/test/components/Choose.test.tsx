@@ -54,9 +54,9 @@ describe("Choose", () => {
     it("dynamically switches content", () => {
         const value = signal(0);
         const choose = <Choose>
-            <When test={() => value() < 1}>A</When>
-            <When test={() => value() < 2}>B</When>
-            <When test={() => value() < 3}>C</When>
+            <When test={() => value.get() < 1}>A</When>
+            <When test={() => value.get() < 2}>B</When>
+            <When test={() => value.get() < 3}>C</When>
             <Otherwise>X</Otherwise>
         </Choose>;
         const root = document.createElement("body");
@@ -86,7 +86,7 @@ describe("Choose", () => {
             return "X";
         }
         const choose = <Choose>
-            <When test={() => value() < 1}><A /></When>
+            <When test={() => value.get() < 1}><A /></When>
             <Otherwise><X /></Otherwise>
         </Choose>;
         const root = document.createElement("body");
@@ -155,7 +155,7 @@ describe("Choose", () => {
         }
         component(X, { inject: [ DepX ] });
         const choose = <Choose>
-            <When test={() => value() < 1}><A /></When>
+            <When test={() => value.get() < 1}><A /></When>
             <Otherwise><X /></Otherwise>
         </Choose>;
         const root = document.createElement("body");

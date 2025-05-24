@@ -4,6 +4,7 @@
  */
 
 import type { Observable } from "@kayahr/observable";
+import type { Signal } from "@kayahr/signal";
 
 import type { JSXElement } from "../JSXElement.js";
 
@@ -11,8 +12,8 @@ import type { JSXElement } from "../JSXElement.js";
 export interface ElementObject extends Record<string | symbol, Element> {}
 
 /** The JSX element type. */
-export type Element = JSXElement | Node | (() => Element) |  bigint | boolean | null | number | string | symbol | undefined | Element[] | Promise<Element>
-    | Observable<Element> | ElementObject;
+export type Element = JSXElement | Node | Signal<Element> | (() => Element) |  bigint | boolean | null | number | string | symbol | undefined | Element[]
+    | Promise<Element> | Observable<Element> | ElementObject;
 
 /** Component properties base type. */
 export type Properties = Record<string, unknown>;

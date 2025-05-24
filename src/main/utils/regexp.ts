@@ -22,5 +22,5 @@ declare global {
  * @returns The escaped string.
  */
 export function escapeRegExp(s: string): string {
-    return RegExp.escape?.(s) ?? s.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
+    return RegExp.escape?.(s) ?? s.replace(/[-/\\^$*+?.()|[\]{}]/g, (a, b) => `\\${a === "-" ? "x2d" : a}`);
 }

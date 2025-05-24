@@ -62,7 +62,7 @@ Context.getActive().setClass(RouteParams);
  * @returns True if pattern matches current path, false if not.
  */
 function isActivePath(pattern: RegExp): boolean {
-    const match = pattern.exec(currentPath());
+    const match = pattern.exec(currentPath.get());
     if (match == null) {
         return false;
     }

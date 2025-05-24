@@ -36,7 +36,7 @@ describe("Routes", () => {
     it("captures route parameters", () => {
         location.hash = "#/a/foo/bar";
         function Component(props: {}, params: RouteParams<{ param1: string, param2: string }>) {
-            return <>Foo: {() => params().param1}, Bar: {() => params().param2}</>;
+            return <>Foo: {() => params.get().param1}, Bar: {() => params.get().param2}</>;
         }
         component(Component, { inject: [ RouteParams ] });
         const choose = <Routes>
@@ -49,7 +49,7 @@ describe("Routes", () => {
     it("captures optional parameters", () => {
         location.hash = "#/a/foo";
         function Component(props: {}, params: RouteParams<{ param1: string, param2?: string }>) {
-            return <>Foo: {() => params().param1}, Bar: {() => params().param2}</>;
+            return <>Foo: {() => params.get().param1}, Bar: {() => params.get().param2}</>;
         }
         component(Component, { inject: [ RouteParams ] });
         const choose = <Routes>
@@ -224,7 +224,7 @@ describe("Routes", () => {
         function ParamsA(props: {}, params: RouteParams<{ a: string }>) {
             initParamsA();
             onDestroy(destroyParamsA);
-            return <>ParamsA: {() => params().a }</>;
+            return <>ParamsA: {() => params.get().a }</>;
         }
         component(ParamsA, { inject: [ RouteParams ] });
         class ParamsB {
@@ -233,7 +233,7 @@ describe("Routes", () => {
             public render() {
                 initParamsB();
                 onDestroy(destroyParamsB);
-                return <>ParamsB: {() => this.params().b }</>;
+                return <>ParamsB: {() => this.params.get().b }</>;
             }
         }
         component(ParamsB, { inject: [ RouteParams ] });

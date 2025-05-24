@@ -44,7 +44,7 @@ document.getElementById("main")?.appendChild(render(() => {
     const add = () => data.push(...buildData(1_000));
     const update = () =>
         atomic(() => {
-            for (let i = 0, d = data(), len = d.length; i < len; i += 10) {
+            for (let i = 0, d = data.get(), len = d.length; i < len; i += 10) {
                 d[i]?.label.update(l => l + " !!!");
             }
         });
@@ -84,7 +84,7 @@ document.getElementById("main")?.appendChild(render(() => {
                         {row => {
                             const rowId = row.id;
                             return (
-                                <tr class={() => selected() === rowId ? "danger" : ""}>
+                                <tr class={() => selected.get() === rowId ? "danger" : ""}>
                                     <td class="col-md-1">{rowId}</td>
                                     <td class="col-md-4">
                                         <a onclick={() => selected.set(rowId)}>{row.label}</a>

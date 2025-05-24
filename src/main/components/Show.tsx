@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information.
  */
 
-import { computed } from "@kayahr/signal";
+import { computed, type SignalSource, toSignal } from "@kayahr/signal";
 
 import type { Element } from "../utils/types.js";
 
@@ -15,7 +15,7 @@ export interface ShowProperties {
      * The condition to control when the component body should be shown. Must be a function or a signal returning true to show the body, false to hide it and
      * instead show the optional fallback content.
      */
-    when: () => boolean;
+    when: SignalSource<boolean>;
 
     /** The content to show when condition is true. */
     children?: unknown;
@@ -30,5 +30,5 @@ export interface ShowProperties {
  * @param properties - The component properties.
  */
 export function Show({ when, children, fallback = null }: ShowProperties): Element {
-    return <>{computed(() => when() ? children : fallback)}</>;
+    return <>{computed(() => toSignal(when).get() === true ? children : fallback)}</>;
 }
