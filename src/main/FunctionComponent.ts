@@ -9,8 +9,7 @@ import { Component } from "./Component.js";
 import type { Element, Properties } from "./utils/types.js";
 
 /** Type of a function creating a JSX Element. */
-export type ComponentFunction<T extends Properties = Properties, R extends Element = Element> =
-    (props: T, ...injects: any[]) => R;
+export type ComponentFunction<T extends Properties = Properties, R extends Element = Element> = (props: T, ...injects: any[]) => R;
 
 /**
  * JSX element for rendering a function component.
