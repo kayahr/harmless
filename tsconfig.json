@@ -8,7 +8,7 @@
             "ES2022",
             "DOM"
         ],
-        "module": "NodeNext",
+        "module": "node20",
         "newLine": "lf",
         "jsx": "react-jsx",
         "jsxImportSource": "@kayahr/harmless",
@@ -26,6 +26,6 @@
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
-        "target": "ES2022"
+        "target": "es2022"
     }
 }
