@@ -98,13 +98,28 @@ export function Route({ path: test, children }: RouteProperties): RoutePropertie
     return { path: test, children };
 }
 
+/**
+ * Properties for the {@link A} component.
+ */
 export interface AProperties {
+    /** The route path to link to. */
     href: string;
+
+    /** CSS class to set if the route of this link is currently active. */
     activeClass?: string;
+
+    /** CSS class to set if the route of this link is currently inactive. */
     inactiveClass?: string;
+
+    /** The link children to render. */
     children?: Element;
 }
 
+/**
+ * Component to output a link to a router target.
+ *
+ * @param properties - The component properties.
+ */
 export function A({ href, activeClass, inactiveClass, children }: AProperties): Element {
     const pattern = createPathPattern(href);
     return <a href={"#" + href} class={() => (isActivePath(pattern) ? activeClass : inactiveClass) ?? ""}>{children}</a>;
