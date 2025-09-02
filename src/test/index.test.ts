@@ -8,6 +8,8 @@ import { describe, expect, it } from "vitest";
 import { type ComponentClass } from "../main/ClassComponent.js";
 import { Choose, Otherwise, When, type WhenProperties } from "../main/components/Choose.js";
 import { For, type ForProperties } from "../main/components/For.js";
+import { If, type IfProperties } from "../main/components/If.js";
+import { A, type AProperties, Route, type RouteParams, type RouteProperties, Routes } from "../main/components/Route.js";
 import { Show, type ShowProperties } from "../main/components/Show.js";
 import { Context } from "../main/Context.js";
 import * as exports from "../main/index.js";
@@ -26,6 +28,10 @@ describe("index", () => {
             JSXElement,
             Show,
             For,
+            Route,
+            Routes,
+            A,
+            If,
             onDestroy,
             ref,
             Context,
@@ -41,11 +47,14 @@ describe("index", () => {
         ((): ForProperties => (({} as exports.ForProperties)))();
         ((): ComponentOptions => (({} as exports.ComponentOptions)))();
         ((): WhenProperties => (({} as exports.WhenProperties)))();
+        ((): AProperties => (({} as exports.AProperties)))();
         ((): ComponentClass => (({} as exports.ComponentClass)))();
         ((): ElementObject => (({} as exports.ElementObject)))();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        ((): Element => (({} as exports.Element)))();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        ((): Element => (({} as exports.JSX.Element)))();
+        ((): IfProperties => (({} as exports.IfProperties)))();
+        ((): RouteParams => (({} as exports.RouteParams)))();
+        ((): RouteProperties => (({} as exports.RouteProperties)))();
+
+        void ((): Element => (({} as exports.Element)))();
+        void ((): Element => (({} as exports.JSX.Element)))();
     });
 });

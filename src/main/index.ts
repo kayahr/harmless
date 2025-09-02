@@ -10,6 +10,8 @@
 export { type ComponentClass } from "./ClassComponent.js";
 export { Choose, Otherwise, When, type WhenProperties } from "./components/Choose.js";
 export { For, type ForProperties } from "./components/For.js";
+export { If, type IfProperties } from "./components/If.js";
+export { A, type AProperties, Route, type RouteParams, type RouteProperties, Routes } from "./components/Route.js";
 export { Show, type ShowProperties } from "./components/Show.js";
 export { Context } from "./Context.js";
 export { type JSX } from "./JSX.js";

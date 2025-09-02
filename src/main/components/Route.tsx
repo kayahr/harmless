@@ -97,3 +97,15 @@ export type RouteProperties = {
 export function Route({ path: test, children }: RouteProperties): RouteProperties {
     return { path: test, children };
 }
+
+export interface AProperties {
+    href: string;
+    activeClass?: string;
+    inactiveClass?: string;
+    children?: Element;
+}
+
+export function A({ href, activeClass, inactiveClass, children }: AProperties): Element {
+    const pattern = createPathPattern(href);
+    return <a href={"#" + href} class={() => (isActivePath(pattern) ? activeClass : inactiveClass) ?? ""}>{children}</a>;
+}
