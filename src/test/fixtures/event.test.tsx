@@ -5,72 +5,73 @@
 
 import { Observable } from "@kayahr/observable";
 import { signal } from "@kayahr/signal";
-import { describe, expect, it, vi } from "vitest";
+import { describe, it } from "node:test";
 
-import { render } from "./render.js";
+import { render } from "./render.ts";
+import { assertInstanceOf, assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("event", () => {
-        it("can be registered statically", () => {
-            const handler = vi.fn();
+        it("can be registered statically", (context) => {
+            const handler = context.mock.fn();
             const root = render(<button id="btn" onclick={handler} />);
-            expect(root.innerHTML).toBe('<button id="btn"></button>');
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(root.innerHTML, '<button id="btn"></button>');
+            assertSame(handler.mock.callCount(), 0);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).toHaveBeenCalledOnce();
-            expect(handler.mock.calls[0].length).toBe(1);
-            expect(handler.mock.calls[0][0]).toBeInstanceOf(Event);
+            assertSame(handler.mock.callCount(), 1);
+            assertSame(handler.mock.calls[0].arguments.length, 1);
+            assertInstanceOf(handler.mock.calls[0].arguments[0], Event);
         });
-        it("can be registered via Promise", async () => {
-            const handler = vi.fn();
+        it("can be registered via Promise", async (context) => {
+            const handler = context.mock.fn();
             const promise = new Promise(resolve => setTimeout(() => resolve(handler), 0));
             const root = render(<button id="btn" onclick={promise} />);
-            expect(root.innerHTML).toBe('<button id="btn"></button>');
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(root.innerHTML, '<button id="btn"></button>');
+            assertSame(handler.mock.callCount(), 0);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(handler.mock.callCount(), 0);
             await promise;
             root.getElementsByTagName("button")[0].click();
-            expect(handler).toHaveBeenCalledOnce();
-            expect(handler.mock.calls[0].length).toBe(1);
-            expect(handler.mock.calls[0][0]).toBeInstanceOf(Event);
+            assertSame(handler.mock.callCount(), 1);
+            assertSame(handler.mock.calls[0].arguments.length, 1);
+            assertInstanceOf(handler.mock.calls[0].arguments[0], Event);
         });
-        it("can be registered via Observable", () => {
-            const handler = vi.fn();
+        it("can be registered via Observable", (context) => {
+            const handler = context.mock.fn();
             let next = (value: Function | null) => {};
             const observable = new Observable<Function | null>(observer => { next = v => observer.next(v); });
             const root = render(<button id="btn" onclick={observable} />);
-            expect(root.innerHTML).toBe('<button id="btn"></button>');
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(root.innerHTML, '<button id="btn"></button>');
+            assertSame(handler.mock.callCount(), 0);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(handler.mock.callCount(), 0);
             next(handler);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).toHaveBeenCalledOnce();
-            expect(handler.mock.calls[0].length).toBe(1);
-            expect(handler.mock.calls[0][0]).toBeInstanceOf(Event);
-            handler.mockClear();
+            assertSame(handler.mock.callCount(), 1);
+            assertSame(handler.mock.calls[0].arguments.length, 1);
+            assertInstanceOf(handler.mock.calls[0].arguments[0], Event);
+            handler.mock.resetCalls();
             next(null);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(handler.mock.callCount(), 0);
         });
-        it("can be registered via signal", () => {
-            const handler = vi.fn();
+        it("can be registered via signal", (context) => {
+            const handler = context.mock.fn();
             const sig = signal<Function | null>(null);
             const root = render(<button id="btn" onclick={sig} />);
-            expect(root.innerHTML).toBe('<button id="btn"></button>');
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(root.innerHTML, '<button id="btn"></button>');
+            assertSame(handler.mock.callCount(), 0);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(handler.mock.callCount(), 0);
             sig.set(handler);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).toHaveBeenCalledOnce();
-            expect(handler.mock.calls[0].length).toBe(1);
-            expect(handler.mock.calls[0][0]).toBeInstanceOf(Event);
-            handler.mockClear();
+            assertSame(handler.mock.callCount(), 1);
+            assertSame(handler.mock.calls[0].arguments.length, 1);
+            assertInstanceOf(handler.mock.calls[0].arguments[0], Event);
+            handler.mock.resetCalls();
             sig.set(null);
             root.getElementsByTagName("button")[0].click();
-            expect(handler).not.toHaveBeenCalled();
+            assertSame(handler.mock.callCount(), 0);
         });
     });
 });

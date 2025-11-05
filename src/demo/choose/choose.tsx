@@ -5,8 +5,8 @@
 
 import {  signal } from "@kayahr/signal";
 
-import { Choose, Otherwise, When } from "../../main/components/Choose.js";
-import { render } from "../../main/utils/render.js";
+import { Choose, Otherwise, When } from "../../main/components/Choose.ts";
+import { render } from "../../main/utils/render.ts";
 
 function Root() {
     const value = signal(1);

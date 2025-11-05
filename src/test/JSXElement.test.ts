@@ -3,10 +3,11 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { JSXElement } from "../main/JSXElement.js";
-import type { Element } from "../main/utils/types.js";
+import { JSXElement } from "../main/JSXElement.ts";
+import type { Element } from "../main/utils/types.ts";
+import { assertInstanceOf, assertSame } from "@kayahr/assert";
 
 class TestElement extends JSXElement {
     protected override doRender(): Element | Promise<Element> {
@@ -19,18 +20,18 @@ describe("JSXElement", () => {
         it("returns already created element if rendered before", () => {
             const test = new TestElement();
             const first = test.render();
-            expect(first).toBeInstanceOf(Function);
+            assertInstanceOf(first, Function);
             const second = test.render();
-            expect(second).toBe(first);
+            assertSame(second, first);
         });
     });
     describe("createNode", () => {
         it("returns already created node if created before", () => {
             const test = new TestElement();
             const first = test.createNode();
-            expect(first).toBeInstanceOf(HTMLDivElement);
+            assertInstanceOf(first, HTMLDivElement);
             const second = test.createNode();
-            expect(second).toBe(first);
+            assertSame(second, first);
         });
     });
 });

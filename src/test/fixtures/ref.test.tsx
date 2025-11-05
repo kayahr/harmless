@@ -3,10 +3,11 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { ref } from "../../main/utils/Reference.js";
-import { render } from "./render.js";
+import { ref } from "../../main/utils/Reference.ts";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("ref", () => {
@@ -16,7 +17,7 @@ describe("fixture", () => {
                 <h1><span ref={spanRef}>Text</span></h1>
                 <h2>{spanRef}</h2>
             </>);
-            expect(root.innerHTML).toBe("<!--<>--><h1></h1><h2><span>Text</span></h2><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>--><h1></h1><h2><span>Text</span></h2><!--</>-->");
         });
     });
 });

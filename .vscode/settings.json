@@ -5,12 +5,26 @@
         "node_modules": true
     },
     "task.allowAutomaticTasks": "on",
-    "javascript.preferences.importModuleSpecifierEnding": "js",
-    "typescript.preferences.importModuleSpecifierEnding": "js",
     "typescript.preferences.autoImportFileExcludePatterns": [
         "@kayahr/harmless",
         "@kayahr/harmless/jsx-runtime",
         "./src/main/index.ts",
         "./src/main/jsx-runtime.ts"
+    ],
+    "nodejs-testing.extensions": [
+        {
+            "extensions": [ "js" ],
+            "filePatterns": [
+                "lib/test/**/*.test.js"
+            ],
+            "parameters": [
+                "--experimental-test-coverage"
+            ]
+        }
+    ],
+    "oxc.enable": true,
+    "oxc.typeAware": true,
+    "coverage-gutters.coverageFileNames": [
+        "lib/test/lcov.info"
     ]
 }

@@ -3,10 +3,11 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import type { Element } from "../../main/utils/types.js";
-import { render } from "./render.js";
+import type { Element } from "../../main/utils/types.ts";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("class component", () => {
@@ -28,18 +29,16 @@ describe("fixture", () => {
                 }
             }
 
-            const CompB = ({ a, key }: { a: number, key: string }) => {
-                return <>
-                    <div id="a">{a}</div>
-                    <div id="key">{key}</div>
-                </>;
-            };
+            const CompB = ({ a, key }: { a: number, key: string }) => <>
+                <div id="a">{a}</div>
+                <div id="key">{key}</div>
+            </>;
 
             const root = render(<>
                 <CompA a={1} key="key1" />
                 <CompB a={2} key="key2" />
             </>);
-            expect(root.innerHTML).toBe(
+            assertSame(root.innerHTML,
                 "<!--<>-->"
                 + '<!--<>--><span id="a">1</span><span id="key">key1</span><!--</>-->'
                 + '<!--<>--><div id="a">2</div><div id="key">key2</div><!--</>-->'

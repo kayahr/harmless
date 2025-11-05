@@ -3,10 +3,10 @@
  * See LICENSE.md for licensing information
  */
 
-import { component, render, Show } from "@kayahr/harmless";
+import { Show, component, render } from "@kayahr/harmless";
 import { signal } from "@kayahr/signal";
 
-import { RouteParams } from "../../main/components/Route.js";
+import { RouteParams } from "../../main/components/Route.ts";
 
 // In this example the built-in `Show` component is used to conditionally display content.
 

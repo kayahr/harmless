@@ -4,9 +4,10 @@
  */
 
 import { Observable } from "@kayahr/observable";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { render } from "./render.js";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("recursive children", () => {
@@ -15,17 +16,17 @@ describe("fixture", () => {
             const observable = new Observable<number | null>(observer => { next = v => observer.next(v); observer.next(-1); });
             const promise = new Promise(resolve => setTimeout(() => resolve(observable), 0));
             const root = render(<>{[ "Value: ", [ () => promise ] ]}</>);
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
             next(1);
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
             await promise;
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>-->-1<!--</>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!--<>-->-1<!--</>--><!--</>-->");
             next(2);
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>-->2<!--</>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!--<>-->2<!--</>--><!--</>-->");
             next(3);
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>-->3<!--</>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!--<>-->3<!--</>--><!--</>-->");
             next(null);
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!--<>--><!--</>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!--<>--><!--</>--><!--</>-->");
         });
     });
     describe("recursive attributes", () => {
@@ -34,17 +35,17 @@ describe("fixture", () => {
             const observable = new Observable<number | null>(observer => { next = v => observer.next(v); observer.next(-1); });
             const promise = new Promise(resolve => setTimeout(() => resolve(observable), 0));
             const root = render(<input value={() => promise} />);
-            expect(root.innerHTML).toBe("<input>");
+            assertSame(root.innerHTML, "<input>");
             next(1);
-            expect(root.innerHTML).toBe("<input>");
+            assertSame(root.innerHTML, "<input>");
             await promise;
-            expect(root.innerHTML).toBe('<input value="-1">');
+            assertSame(root.innerHTML, '<input value="-1">');
             next(2);
-            expect(root.innerHTML).toBe('<input value="2">');
+            assertSame(root.innerHTML, '<input value="2">');
             next(3);
-            expect(root.innerHTML).toBe('<input value="3">');
+            assertSame(root.innerHTML, '<input value="3">');
             next(null);
-            expect(root.innerHTML).toBe("<input>");
+            assertSame(root.innerHTML, "<input>");
         });
     });
 });

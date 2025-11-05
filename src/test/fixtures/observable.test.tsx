@@ -4,9 +4,10 @@
  */
 
 import { Observable } from "@kayahr/observable";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { render } from "./render.js";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("observable", () => {
@@ -14,21 +15,21 @@ describe("fixture", () => {
             let next = (value: number) => {};
             const observable = new Observable<number>(observer => { next = v => observer.next(v); });
             const root = render(<>Value: {observable}</>);
-            expect(root.innerHTML).toBe("<!--<>-->Value: <!----><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: <!----><!--</>-->");
             next(1);
-            expect(root.innerHTML).toBe("<!--<>-->Value: 1<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: 1<!--</>-->");
             next(2);
-            expect(root.innerHTML).toBe("<!--<>-->Value: 2<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Value: 2<!--</>-->");
         });
         it("renders correctly as attribute", () => {
             let next = (value: number) => {};
             const observable = new Observable<number>(observer => { next = v => observer.next(v); });
             const root = render(<input value={observable} />);
-            expect(root.innerHTML).toBe("<input>");
+            assertSame(root.innerHTML, "<input>");
             next(1);
-            expect(root.innerHTML).toBe('<input value="1">');
+            assertSame(root.innerHTML, '<input value="1">');
             next(2);
-            expect(root.innerHTML).toBe('<input value="2">');
+            assertSame(root.innerHTML, '<input value="2">');
         });
     });
 });

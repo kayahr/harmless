@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information.
  */
 
-import { Context } from "../Context.js";
+import { Context } from "../Context.ts";
 
 /**
  * Registers a function in the current component scope which is called when component is destroyed. For function component this must be used within the

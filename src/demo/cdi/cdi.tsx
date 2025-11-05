@@ -6,10 +6,10 @@
 import { injectable } from "@kayahr/cdi";
 import { signal } from "@kayahr/signal";
 
-import { Show } from "../../main/components/Show.js";
-import type { JSX } from "../../main/JSX.js";
-import { component } from "../../main/utils/component.js";
-import { render } from "../../main/utils/render.js";
+import { Show } from "../../main/components/Show.ts";
+import type { JSX } from "../../main/JSX.ts";
+import { component } from "../../main/utils/component.ts";
+import { render } from "../../main/utils/render.ts";
 
 export async function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));

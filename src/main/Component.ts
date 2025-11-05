@@ -3,10 +3,10 @@
  * See LICENSE.md for licensing information.
  */
 
-import type { ComponentConstructor } from "./ClassComponent.js";
-import type { ComponentFunction } from "./FunctionComponent.js";
-import { JSXElement } from "./JSXElement.js";
-import type { Element, Properties } from "./utils/types.js";
+import type { ComponentConstructor } from "./ClassComponent.ts";
+import type { ComponentFunction } from "./FunctionComponent.ts";
+import { JSXElement } from "./JSXElement.ts";
+import type { Element, Properties } from "./utils/types.ts";
 
 export type ComponentSource<P extends Properties = Properties, R extends Element = Element> = ComponentConstructor<P, R> | ComponentFunction<P, R>;
 

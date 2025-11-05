@@ -3,10 +3,10 @@
  * See LICENSE.md for licensing information.
  */
 
-import { ClassComponent, type ComponentConstructor, isComponentConstructor } from "./ClassComponent.js";
-import { type ComponentFunction, FunctionComponent } from "./FunctionComponent.js";
-import { IntrinsicElement } from "./IntrinsicElement.js";
-import type { Element, Properties } from "./utils/types.js";
+import { ClassComponent, type ComponentConstructor, isComponentConstructor } from "./ClassComponent.ts";
+import { type ComponentFunction, FunctionComponent } from "./FunctionComponent.ts";
+import { IntrinsicElement } from "./IntrinsicElement.ts";
+import type { Element, Properties } from "./utils/types.ts";
 
 /** The element source which can be a intrinsic element tag name, an element factory function or an element class constructor. */
 export type ElementSource = string | ComponentFunction | ComponentConstructor;
@@ -36,7 +36,7 @@ export function jsx(source: ElementSource, props: Properties, key?: unknown): El
 
     if (typeof source === "string") {
         // Source is an intrinsic element
-        const children = props.children != null ? props.children instanceof Array ? props.children : [ props.children ] : [];
+        const children = props.children != null ? (props.children instanceof Array ? props.children : [ props.children ]) : [];
         delete props.children;
         return new IntrinsicElement(source, props, children);
     } else if (isComponentConstructor(source)) {

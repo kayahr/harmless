@@ -3,9 +3,9 @@
  * See LICENSE.md for licensing information
  */
 
-import { Route, RouteParams, Routes } from "../../main/components/Route.js";
-import { component } from "../../main/utils/component.js";
-import { render } from "../../main/utils/render.js";
+import { Route, RouteParams, Routes } from "../../main/components/Route.ts";
+import { component } from "../../main/utils/component.ts";
+import { render } from "../../main/utils/render.ts";
 
 function User(props: unknown, params: RouteParams<{ id: string }>) {
     return <div>User {() => params.get().id}</div>;

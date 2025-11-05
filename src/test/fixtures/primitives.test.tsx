@@ -3,9 +3,10 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { render } from "./render.js";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("primitives", () => {
@@ -19,7 +20,7 @@ describe("fixture", () => {
                   <span id="undefined">{undefined}</span>
                 </div>
             );
-            expect(root.innerHTML).toBe("<div>"
+            assertSame(root.innerHTML, "<div>"
                 + '<span id="string">Test</span>'
                 + '<span id="numbers">123 -23 13.45 -42.01 Infinity -Infinity NaN 0 0</span>'
                 + '<span id="booleans">true false</span>'
@@ -38,7 +39,7 @@ describe("fixture", () => {
                   <input id="undefined" value={undefined} />
                 </>
             );
-            expect(root.innerHTML).toBe("<!--<>-->"
+            assertSame(root.innerHTML, "<!--<>-->"
                 + '<input id="string" value="string">'
                 + '<input id="number" value="123">'
                 + '<input id="true" value="">'

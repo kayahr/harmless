@@ -3,15 +3,16 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { render } from "./render.js";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("array", () => {
         it("renders correctly", () => {
             const root = render(<div>{[ 1, " ", 3, ":", false, ":", null, [ "!", "!!" ] ]}</div>);
-            expect(root.innerHTML).toBe("<div>1 3:false:<!--<>-->!!!<!--</>--></div>");
+            assertSame(root.innerHTML, "<div>1 3:false:<!--<>-->!!!<!--</>--></div>");
         });
     });
 });

@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information
  */
 
-import { type Destroyable, setSignalContext, type SignalContext } from "@kayahr/signal";
+import { type Destroyable, type SignalContext, setSignalContext } from "@kayahr/signal";
 
 /**
  * A destroyable context hierarchy.

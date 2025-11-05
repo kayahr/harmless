@@ -3,11 +3,11 @@
  * See LICENSE.md for licensing information.
  */
 
-import { isSubscribable, type Subscribable } from "@kayahr/observable";
-import { computed, WritableSignal } from "@kayahr/signal";
+import { type Subscribable, isSubscribable } from "@kayahr/observable";
+import { WritableSignal, computed } from "@kayahr/signal";
 
-import { JSXElement } from "./JSXElement.js";
-import { Reference } from "./utils/Reference.js";
+import { JSXElement } from "./JSXElement.ts";
+import { Reference } from "./utils/Reference.ts";
 
 /**
  * JSX element for rendering an intrinsic HTML element.
@@ -124,7 +124,7 @@ export class IntrinsicElement extends JSXElement<Node> {
         }
     }
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     public doRender(): Node {
         return this.runInContext(() => {
             const element = document.createElement(this.#tag);

@@ -3,25 +3,25 @@
  * See LICENSE.md for licensing information
  */
 
-import "@kayahr/vitest-matchers";
 
 import { Context } from "@kayahr/cdi";
 import { computed } from "@kayahr/signal";
-import { describe, expect, it, vi } from "vitest";
+import { describe, it } from "node:test";
 
-import { ClassComponent, type ComponentClass, isComponentConstructor } from "../main/ClassComponent.js";
-import { component } from "../main/utils/component.js";
-import { onDestroy } from "../main/utils/lifecycle.js";
-import type { Element } from "../main/utils/types.js";
-import { sleep } from "./support.js";
+import { ClassComponent, type ComponentClass, isComponentConstructor } from "../main/ClassComponent.ts";
+import { component } from "../main/utils/component.ts";
+import { onDestroy } from "../main/utils/lifecycle.ts";
+import type { Element } from "../main/utils/types.ts";
+import { sleep } from "./support.ts";
+import { assertSame, assertThrowWithMessage } from "@kayahr/assert";
 
 describe("isElementClass", () => {
     it("returns true when object is a class with a render method, false otherwise", () => {
-        expect(isComponentConstructor({ render: () => {} })).toBe(false);
-        expect(isComponentConstructor(class {})).toBe(false);
-        expect(isComponentConstructor({ prototype: { render: () => {} } })).toBe(false);
-        expect(isComponentConstructor(() => {})).toBe(false);
-        expect(isComponentConstructor(class { public render(): void {} })).toBe(true);
+        assertSame(isComponentConstructor({ render: () => {} }), false);
+        assertSame(isComponentConstructor(class {}), false);
+        assertSame(isComponentConstructor({ prototype: { render: () => {} } }), false);
+        assertSame(isComponentConstructor(() => {}), false);
+        assertSame(isComponentConstructor(class { public render(): void {} }), true);
     });
 });
 
@@ -43,7 +43,7 @@ describe("ClassComponent", () => {
             }
             const element = new ClassComponent(Test, { a: 12, b: "test" });
             const node = element.createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>a=12 b=test</div>");
+            assertSame(node.outerHTML, "<div>a=12 b=test</div>");
         });
         it("resolves component function synchronously from DI context if possible", () => {
             const context = Context.getActive();
@@ -57,7 +57,7 @@ describe("ClassComponent", () => {
             component(Component, { inject: [ "name" ] });
             const element = new ClassComponent(Component, { a: 3 });
             const node = element.createNode() as HTMLElement;
-            expect(node.outerHTML).toBe("<div>Jane 3</div>");
+            assertSame(node.outerHTML, "<div>Jane 3</div>");
         });
         it("resolves component function asynchronously from DI context if present and if function has asynchronous dependencies", async () => {
             const context = Context.getActive();
@@ -73,12 +73,12 @@ describe("ClassComponent", () => {
             const element = new ClassComponent(Component, { a: 2 });
             const root = document.createElement("div");
             root.appendChild(element.createNode());
-            expect(root.innerHTML).toBe("<!---->");
+            assertSame(root.innerHTML, "<!---->");
             await sleep(); // Wait a macro task to ensure all involved promises are settled
-            expect(root.innerHTML).toBe("<div>Jane 2</div>");
+            assertSame(root.innerHTML, "<div>Jane 2</div>");
         });
-        it("registers onDestroy method if present", () => {
-            const destroy = vi.fn();
+        it("registers onDestroy method if present", (context) => {
+            const destroy = context.mock.fn();
             class Test implements ComponentClass {
                 public render(): Element {
                     return <div></div>;
@@ -90,9 +90,9 @@ describe("ClassComponent", () => {
             }
             const element = new ClassComponent(Test, {});
             element.createNode() as HTMLElement;
-            expect(destroy).not.toHaveBeenCalled();
+            assertSame(destroy.mock.callCount(), 0);
             element.destroy();
-            expect(destroy).toHaveBeenCalledOnce();
+            assertSame(destroy.mock.callCount(), 1);
         });
     });
     describe("renderSync", () => {
@@ -104,7 +104,7 @@ describe("ClassComponent", () => {
             }
             const component = new ClassComponent(Test, {});
             const element = component.renderSync();
-            expect(element).toBe("test");
+            assertSame(element, "test");
         });
         it("throws error when rendered into Promise", () => {
             class Test {
@@ -113,11 +113,11 @@ describe("ClassComponent", () => {
                 }
             }
             const component = new ClassComponent(Test, {});
-            expect(() => component.renderSync()).toThrowWithMessage(Error, "Synchronous rendering requested but promise encountered");
+            assertThrowWithMessage(() => component.renderSync(), Error, "Synchronous rendering requested but promise encountered");
         });
     });
-    it("calls onDestroy handler when component is destroyed", () => {
-        const destroy = vi.fn();
+    it("calls onDestroy handler when component is destroyed", (context) => {
+        const destroy = context.mock.fn();
         class Test implements ComponentClass {
             public render(): Element {
                 onDestroy(destroy);
@@ -126,12 +126,12 @@ describe("ClassComponent", () => {
         }
         const element = new ClassComponent(Test, {});
         element.createNode();
-        expect(destroy).not.toHaveBeenCalled();
+        assertSame(destroy.mock.callCount(), 0);
         element.destroy();
-        expect(destroy).toHaveBeenCalledOnce();
+        assertSame(destroy.mock.callCount(), 1);
     });
-    it("calls onDestroy handler when synchronous component created from DI context is destroyed", () => {
-        const destroy = vi.fn();
+    it("calls onDestroy handler when synchronous component created from DI context is destroyed", (context) => {
+        const destroy = context.mock.fn();
         Context.getActive().setValue("Jane", "test");
         class Test implements ComponentClass {
             public constructor(public props: { a: number }, public name: string) {}
@@ -144,12 +144,12 @@ describe("ClassComponent", () => {
         component(Test, { inject: [ "test" ] });
         const element = new ClassComponent(Test, { a: 4 });
         element.createNode();
-        expect(destroy).not.toHaveBeenCalled();
+        assertSame(destroy.mock.callCount(), 0);
         element.destroy();
-        expect(destroy).toHaveBeenCalledOnce();
+        assertSame(destroy.mock.callCount(), 1);
     });
-    it("calls onDestroy handler when asynchronous component created from DI context is destroyed", async () => {
-        const destroy = vi.fn();
+    it("calls onDestroy handler when asynchronous component created from DI context is destroyed", async (context) => {
+        const destroy = context.mock.fn();
         Context.getActive().setValue(Promise.resolve("Jane"), "test");
         class Test implements ComponentClass {
             public constructor(public props: { a: number }, public name: string) {}
@@ -163,9 +163,9 @@ describe("ClassComponent", () => {
         const element = new ClassComponent(Test, { a: 4 });
         element.createNode();
         await sleep(); // Wait a macro task to ensure all involved promises are settled
-        expect(destroy).not.toHaveBeenCalled();
+        assertSame(destroy.mock.callCount(), 0);
         element.destroy();
-        expect(destroy).toHaveBeenCalledOnce();
+        assertSame(destroy.mock.callCount(), 1);
     });
     it("does not destroy signals created in synchronous dependencies when component is destroyed", () => {
         class Dep {
@@ -183,6 +183,6 @@ describe("ClassComponent", () => {
         const element = new ClassComponent(Component, {});
         element.createNode();
         element.destroy();
-        expect(Context.getActive().getSync(Dep).value.get()).toBe(3);
+        assertSame(Context.getActive().getSync(Dep).value.get(), 3);
     });
 });

@@ -3,19 +3,19 @@
  * See LICENSE.md for licensing information
  */
 
-import "@kayahr/vitest-matchers";
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { Fragment } from "../main/FragmentElement.js";
-import * as exports from "../main/jsx-runtime.js";
-import { jsx, jsxDEV, jsxs } from "../main/jsxFactory.js";
-import type { Element } from "../main/utils/types.js";
+import { Fragment } from "../main/FragmentElement.ts";
+import * as exports from "../main/jsx-runtime.ts";
+import { jsx, jsxDEV, jsxs } from "../main/jsxFactory.ts";
+import type { Element } from "../main/utils/types.ts";
+import { assertEquals } from "@kayahr/assert";
 
 describe("jsx-runtime", () => {
     it("exports relevant types and functions and nothing more", () => {
         // Checks if runtime includes the expected exports and nothing else
-        expect({ ...exports }).toEqual({
+        assertEquals({ ...exports }, {
             Fragment,
             jsx,
             jsxDEV,

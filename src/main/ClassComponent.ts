@@ -5,9 +5,9 @@
 
 import { Context } from "@kayahr/cdi";
 
-import { Component } from "./Component.js";
-import { Context as HarmlessContext } from "./Context.js";
-import type { Element, Properties } from "./utils/types.js";
+import { Component } from "./Component.ts";
+import { Context as HarmlessContext } from "./Context.ts";
+import type { Element, Properties } from "./utils/types.ts";
 
 /**
  * Interface to implement by component classes.
@@ -64,7 +64,7 @@ export class ClassComponent<T extends ComponentConstructor<P, R>, P extends Prop
         this.#properties = properties;
     }
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     protected override doRender(): R | Promise<R> {
         let instance;
         const context = Context.getActive();
@@ -77,10 +77,11 @@ export class ClassComponent<T extends ComponentConstructor<P, R>, P extends Prop
             if (instance instanceof Promise) {
                 // When resolved function is asynchronous because one of its dependencies is asynchronous then insert placeholder node
                 // and replace it later when promise is resolved
-                return instance.then(instance => {
+                return (async () => {
+                    const syncInstance = await instance;
                     // Render the now resolved element class in the signal scope of this function element
-                    return this.runInContext(() => instance.render());
-                }) as Promise<R>;
+                    return this.runInContext(() => syncInstance.render());
+                })();
             }
         } else {
             instance = this.runInContext(() => new this.source(this.#properties));

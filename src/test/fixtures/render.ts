@@ -3,8 +3,8 @@
  * See LICENSE.md for licensing information
  */
 
-import { render as renderElement } from "../../main/utils/render.js";
-import type { Element } from "../../main/utils/types.js";
+import { render as renderElement } from "../../main/utils/render.ts";
+import type { Element } from "../../main/utils/types.ts";
 
 /**
  * Renders to given JSX element into a body element and returns this body element.

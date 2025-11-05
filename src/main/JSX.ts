@@ -5,8 +5,8 @@
 
 import type { Signal } from "@kayahr/signal";
 
-import type { Reference } from "./utils/Reference.js";
-import type { Element as ElementType } from "./utils/types.js";
+import type { Reference } from "./utils/Reference.ts";
+import type { Element as ElementType } from "./utils/types.ts";
 
 /**
  * JSX namespace.
@@ -58,7 +58,5 @@ export namespace JSX {
      *
      * @internal
      */
-    export interface IntrinsicElements {
-        [ name: string ]: unknown;
-    }
+    export interface IntrinsicElements extends Record<string, unknown> {}
 }

@@ -3,6 +3,6 @@
  * See LICENSE.md for licensing information.
  */
 
-export { Fragment } from "./FragmentElement.js";
-export { type JSX } from "./JSX.js";
-export { jsx, jsxDEV, jsxs } from "./jsxFactory.js";
+export { Fragment } from "./FragmentElement.ts";
+export { type JSX } from "./JSX.ts";
+export { jsx, jsxDEV, jsxs } from "./jsxFactory.ts";

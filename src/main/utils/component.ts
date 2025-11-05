@@ -3,10 +3,10 @@
  * See LICENSE.md for licensing information
  */
 
-import { type ClassDecorator, type Constructor, Context, injectable, type Qualifiers, Scope } from "@kayahr/cdi";
+import { type ClassDecorator, type Constructor, Context, type Qualifiers, Scope, injectable } from "@kayahr/cdi";
 
-import { type ComponentClass, isComponentConstructor } from "../ClassComponent.js";
-import type { Element } from "./types.js";
+import { type ComponentClass, isComponentConstructor } from "../ClassComponent.ts";
+import type { Element } from "./types.ts";
 
 /**
  * Drops the first element from the given array and returns a type with the rest.

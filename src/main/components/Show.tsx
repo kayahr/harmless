@@ -3,9 +3,9 @@
  * See LICENSE.md for licensing information.
  */
 
-import { computed, type SignalSource, toSignal } from "@kayahr/signal";
+import { type SignalSource, computed, toSignal } from "@kayahr/signal";
 
-import type { Element } from "../utils/types.js";
+import type { Element } from "../utils/types.ts";
 
 /**
  * Properties for the {@link Show} component.

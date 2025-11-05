@@ -5,35 +5,34 @@
 
 import { Context } from "@kayahr/cdi";
 import { signal } from "@kayahr/signal";
-import { describe, expect, it, vi } from "vitest";
-
-import { Choose, Otherwise, When } from "../../main/components/Choose.js";
-import { component } from "../../main/utils/component.js";
-import { onDestroy } from "../../main/utils/lifecycle.js";
-import { render } from "../../main/utils/render.js";
-import { sleep } from "../support.js";
+import { describe, it } from "node:test";
+import { assertGreaterThan, assertSame } from "@kayahr/assert";
+import { Choose, Otherwise, When } from "../../main/components/Choose.ts";
+import { component } from "../../main/utils/component.ts";
+import { onDestroy } from "../../main/utils/lifecycle.ts";
+import { render } from "../../main/utils/render.ts";
+import { sleep } from "../support.ts";
 
 describe("Choose", () => {
     it("renders empty node if empty", () => {
         const choose = <Choose></Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--</>-->");
     });
     it("renders first <When> node that matches test expression", () => {
         const choose = <Choose>
-            <When test={() => 1 > 1}>A</When>
+            <When test={() => Math.random() > 1}>A</When>
             <When test={() => 2 > 1}>B</When>
             <When test={() => 3 > 1}>C</When>
             <Otherwise>X</Otherwise>
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
     });
     it("renders first <Otherwise> node when no <When> node matches test expression", () => {
         const choose = <Choose>
-            <When test={() => 1 < 1}>A</When>
             <When test={() => 2 < 1}>B</When>
             <When test={() => 3 < 1}>C</When>
             <Otherwise>X</Otherwise>
@@ -41,7 +40,7 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
     });
     it("renders <Otherwise> node when only child", () => {
         const choose = <Choose>
@@ -49,7 +48,7 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
     });
     it("dynamically switches content", () => {
         const value = signal(0);
@@ -61,20 +60,20 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
         value.set(1);
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
         value.set(2);
-        expect(root.innerHTML).toBe("<!--<>-->C<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->C<!--</>-->");
         value.set(3);
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
     });
-    it("initializes shown components and destroys hidden components", () => {
+    it("initializes shown components and destroys hidden components", (context) => {
         const value = signal(0);
-        const initA = vi.fn();
-        const destroyA = vi.fn();
-        const initX = vi.fn();
-        const destroyX = vi.fn();
+        const initA = context.mock.fn();
+        const destroyA = context.mock.fn();
+        const initX = context.mock.fn();
+        const destroyX = context.mock.fn();
         function A() {
             initA();
             onDestroy(destroyA);
@@ -91,45 +90,45 @@ describe("Choose", () => {
         </Choose>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(initA).toHaveBeenCalledOnce();
-        expect(initX).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyX).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
+        assertSame(initA.mock.callCount(), 1);
+        assertSame(initX.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyX.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
 
         value.set(1);
-        expect(initA).not.toHaveBeenCalled();
-        expect(initX).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyX).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
-        initX.mockClear();
-        destroyA.mockClear();
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initX.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyX.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
+        initX.mock.resetCalls();
+        destroyA.mock.resetCalls();
 
         value.set(0);
-        expect(initA).toHaveBeenCalled();
-        expect(initX).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyX).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
-        destroyX.mockClear();
+        assertGreaterThan(initA.mock.callCount(), 0);
+        assertSame(initX.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyX.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
+        destroyX.mock.resetCalls();
 
         value.set(1);
-        expect(initA).not.toHaveBeenCalled();
-        expect(initX).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyX).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initX.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyX.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
     });
 
-    it("initializes shown async components and destroys hidden async components", async () => {
+    it("initializes shown async components and destroys hidden async components", async (context) => {
         const value = signal(0);
-        const initA = vi.fn();
-        const destroyA = vi.fn();
-        const initX = vi.fn();
-        const destroyX = vi.fn();
+        const initA = context.mock.fn();
+        const destroyA = context.mock.fn();
+        const initX = context.mock.fn();
+        const destroyX = context.mock.fn();
         class DepA {
             public static create(): Promise<DepA> {
                 return Promise.resolve(new DepA());
@@ -161,39 +160,39 @@ describe("Choose", () => {
         const root = document.createElement("body");
         root.appendChild(render(choose));
         await sleep(0);
-        expect(initA).toHaveBeenCalledOnce();
-        expect(initX).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyX).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
+        assertSame(initA.mock.callCount(), 1);
+        assertSame(initX.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyX.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
 
         value.set(1);
         await sleep(0);
-        expect(initA).not.toHaveBeenCalled();
-        expect(initX).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyX).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
-        initX.mockClear();
-        destroyA.mockClear();
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initX.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyX.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
+        initX.mock.resetCalls();
+        destroyA.mock.resetCalls();
 
         value.set(0);
         await sleep(0);
-        expect(initA).toHaveBeenCalled();
-        expect(initX).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyX).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
-        destroyX.mockClear();
+        assertGreaterThan(initA.mock.callCount(), 0);
+        assertSame(initX.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyX.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
+        destroyX.mock.resetCalls();
 
         value.set(1);
         await sleep(0);
-        expect(initA).not.toHaveBeenCalled();
-        expect(initX).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyX).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->X<!--</>-->");
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initX.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyX.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
     });
 });

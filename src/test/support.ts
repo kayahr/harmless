@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information
  */
 
-import { RangeFragment, RangeFragmentEnd, RangeFragmentStart } from "../main/RangeFragment.js";
+import { RangeFragment, RangeFragmentEnd, RangeFragmentStart } from "../main/JSXNode.ts";
 
 /**
  * Dumps the given node into a string which can easily be compared in unit tests. Document fragments which were prepared for dumping with
@@ -37,7 +37,7 @@ export function dump(node: Node): string {
  * @param name - Optional fragment name used in the start and end anchor tags of the fragment dump. Defaults to empty string.
  * @returns The created document fragments prepared for dumping.
  */
-export function createFragment(name: string = ""): RangeFragment {
+export function createFragment(name = ""): RangeFragment {
     const fragment = new RangeFragment();
     fragment.toString = () => name;
     return fragment;
@@ -48,6 +48,6 @@ export function createFragment(name: string = ""): RangeFragment {
  *
  * @param ms - The number of milliseconds to sleep. Defaults to 0 which means waiting a single macro task.
  */
-export function sleep(ms: number = 0): Promise<void> {
+export function sleep(ms = 0): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

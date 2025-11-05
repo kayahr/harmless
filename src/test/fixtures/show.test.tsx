@@ -4,47 +4,48 @@
  */
 
 import { signal } from "@kayahr/signal";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { Show } from "../../main/components/Show.js";
-import { onDestroy } from "../../main/utils/lifecycle.js";
-import { render } from "./render.js";
+import { Show } from "../../main/components/Show.ts";
+import { onDestroy } from "../../main/utils/lifecycle.ts";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("show", () => {
         it("renders children when condition is true", () => {
             const root = render(<Show when={() => true}>Shown</Show>);
-            expect(root.innerHTML).toBe("<!--<>-->Shown<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Shown<!--</>-->");
         });
         it("renders nothing when condition is false and no fallback is given", () => {
             const root = render(<Show when={() => false}>Shown</Show>);
-            expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>--><!--</>-->");
         });
         it("renders fallback when condition is false", () => {
             const root = render(<Show when={() => false} fallback={<span>Hidden</span>}>Shown</Show>);
-            expect(root.innerHTML).toBe("<!--<>--><span>Hidden</span><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>--><span>Hidden</span><!--</>-->");
         });
         it("dynamically toggles content when condition result changes", () => {
             const visible = signal(false);
             const root = render(<Show when={visible}>Shown</Show>);
-            expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>--><!--</>-->");
             visible.set(true);
-            expect(root.innerHTML).toBe("<!--<>-->Shown<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Shown<!--</>-->");
             visible.set(false);
-            expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+            assertSame(root.innerHTML, "<!--<>--><!--</>-->");
             visible.set(true);
-            expect(root.innerHTML).toBe("<!--<>-->Shown<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Shown<!--</>-->");
         });
         it("dynamically switches between children and fallback when condition result changes", () => {
             const visible = signal(true);
             const root = render(<Show when={visible} fallback="Hidden">Shown</Show>);
-            expect(root.innerHTML).toBe("<!--<>-->Shown<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Shown<!--</>-->");
             visible.set(false);
-            expect(root.innerHTML).toBe("<!--<>-->Hidden<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Hidden<!--</>-->");
             visible.set(true);
-            expect(root.innerHTML).toBe("<!--<>-->Shown<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Shown<!--</>-->");
             visible.set(false);
-            expect(root.innerHTML).toBe("<!--<>-->Hidden<!--</>-->");
+            assertSame(root.innerHTML, "<!--<>-->Hidden<!--</>-->");
         });
         it("correctly destroys the component which is not active", () => {
             const visible = signal(false);
@@ -61,14 +62,14 @@ describe("fixture", () => {
                 return <span>CompB</span>;
             };
             const root = render(<Show when={visible} fallback={<CompB />}><CompA /></Show>);
-            expect(root.innerHTML).toBe("<!--<>--><span>CompB</span><!--</>-->");
-            expect(compAActive).toBe(false);
-            expect(compBActive).toBe(true);
+            assertSame(root.innerHTML, "<!--<>--><span>CompB</span><!--</>-->");
+            assertSame(compAActive, false);
+            assertSame(compBActive, true);
 
             visible.set(true);
-            expect(root.innerHTML).toBe("<!--<>--><span>CompA</span><!--</>-->");
-            expect(compAActive).toBe(true);
-            expect(compBActive).toBe(false);
+            assertSame(root.innerHTML, "<!--<>--><span>CompA</span><!--</>-->");
+            assertSame(compAActive, true);
+            assertSame(compBActive, false);
         });
         it("correctly destroys the component (returning a fragment) which is not active", () => {
             const visible = signal(false);
@@ -85,14 +86,14 @@ describe("fixture", () => {
                 return <>CompB</>;
             };
             const root = render(<Show when={visible} fallback={<CompB />}><CompA /></Show>);
-            expect(root.innerHTML).toBe("<!--<>--><!--<>-->CompB<!--</>--><!--</>-->");
-            expect(compAActive).toBe(false);
-            expect(compBActive).toBe(true);
+            assertSame(root.innerHTML, "<!--<>--><!--<>-->CompB<!--</>--><!--</>-->");
+            assertSame(compAActive, false);
+            assertSame(compBActive, true);
 
             visible.set(true);
-            expect(root.innerHTML).toBe("<!--<>--><!--<>-->CompA<!--</>--><!--</>-->");
-            expect(compAActive).toBe(true);
-            expect(compBActive).toBe(false);
+            assertSame(root.innerHTML, "<!--<>--><!--<>-->CompA<!--</>--><!--</>-->");
+            assertSame(compAActive, true);
+            assertSame(compBActive, false);
         });
         it("correctly destroys the component (within a fragment) which is not active", () => {
             const visible = signal(false);
@@ -109,14 +110,14 @@ describe("fixture", () => {
                 return <span>CompB</span>;
             };
             const root = render(<Show when={visible} fallback={<><CompB /></>}><><CompA /></></Show>);
-            expect(root.innerHTML).toBe("<!--<>--><!--<>--><span>CompB</span><!--</>--><!--</>-->");
-            expect(compAActive).toBe(false);
-            expect(compBActive).toBe(true);
+            assertSame(root.innerHTML, "<!--<>--><!--<>--><span>CompB</span><!--</>--><!--</>-->");
+            assertSame(compAActive, false);
+            assertSame(compBActive, true);
 
             visible.set(true);
-            expect(root.innerHTML).toBe("<!--<>--><!--<>--><span>CompA</span><!--</>--><!--</>-->");
-            expect(compAActive).toBe(true);
-            expect(compBActive).toBe(false);
+            assertSame(root.innerHTML, "<!--<>--><!--<>--><span>CompA</span><!--</>--><!--</>-->");
+            assertSame(compAActive, true);
+            assertSame(compBActive, false);
         });
     });
 });

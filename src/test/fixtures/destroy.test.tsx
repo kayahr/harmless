@@ -3,15 +3,16 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, it } from "node:test";
 
-import type { JSXElement } from "../../main/JSXElement.js";
-import { onDestroy } from "../../main/utils/lifecycle.js";
+import type { JSXElement } from "../../main/JSXElement.ts";
+import { onDestroy } from "../../main/utils/lifecycle.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("destroy", () => {
-        it("destroys a component after it has been rendered", () => {
-            const destroyed = vi.fn();
+        it("destroys a component after it has been rendered", (context) => {
+            const destroyed = context.mock.fn();
             const Component = () => {
                 onDestroy(destroyed);
                 return <div>test</div>;
@@ -19,9 +20,9 @@ describe("fixture", () => {
             const component = <Component /> as JSXElement;
             component.destroy();
             component.createNode();
-            expect(destroyed).not.toHaveBeenCalled();
+            assertSame(destroyed.mock.callCount(), 0);
             component.destroy();
-            expect(destroyed).toHaveBeenCalledOnce();
+            assertSame(destroyed.mock.callCount(), 1);
         });
     });
 });

@@ -3,15 +3,14 @@
  * See LICENSE.md for licensing information.
  */
 
-import { isSubscribable, type Subscribable } from "@kayahr/observable";
+import { type Subscribable, isSubscribable } from "@kayahr/observable";
 import { computed } from "@kayahr/signal";
 
-import { Context } from "./Context.js";
-import { addNodeReplaceListener, connectElement, getElement, replaceNode } from "./JSXNode.js";
-import { PlaceholderNode } from "./PlaceholderNode.js";
-import { RangeFragment } from "./RangeFragment.js";
-import { Reference } from "./utils/Reference.js";
-import type { Element } from "./utils/types.js";
+import { Context } from "./Context.ts";
+import { RangeFragment, addNodeReplaceListener, connectElement, getElement, replaceNode } from "./JSXNode.ts";
+import { PlaceholderNode } from "./PlaceholderNode.ts";
+import { Reference } from "./utils/Reference.ts";
+import type { Element } from "./utils/types.ts";
 
 /**
  * Base class for JSX elements.
@@ -36,12 +35,13 @@ export abstract class JSXElement<T extends Element = Element> {
     protected resolveNodeFromPromise(source: Promise<unknown>): Node {
         const context = new Context();
         const node: Node = new PlaceholderNode();
-        void source.then(source => {
-            const newNode = context.runInContext(() => this.resolveNode(source));
+        void (async () => {
+            const syncSource = await source;
+            const newNode = context.runInContext(() => this.resolveNode(syncSource));
             connectElement(newNode, getElement(node));
             connectElement(node, null);
             replaceNode(node, newNode);
-        });
+        })();
         return node;
     }
 
@@ -152,7 +152,7 @@ export abstract class JSXElement<T extends Element = Element> {
         return result;
     }
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     public createNode(): Node {
         if (this.#node != null) {
             return this.#node;

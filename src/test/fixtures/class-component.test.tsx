@@ -3,10 +3,11 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import type { Element } from "../../main/utils/types.js";
-import { render } from "./render.js";
+import type { Element } from "../../main/utils/types.ts";
+import { render } from "./render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("fixture", () => {
     describe("class component", () => {
@@ -44,7 +45,7 @@ describe("fixture", () => {
                 <span>test</span>
                 <CompA a={53} b="test" />
             </CompB>);
-            expect(root.innerHTML).toBe('<div><span>test</span><!--<>--><span id="a">53</span><span id="b">test</span><!--</>--></div>');
+            assertSame(root.innerHTML, '<div><span>test</span><!--<>--><span id="a">53</span><span id="b">test</span><!--</>--></div>');
         });
     });
 });

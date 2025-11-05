@@ -3,9 +3,9 @@
  * See LICENSE.md for licensing information
  */
 
-import { computed, type Signal, signal, type SignalSource, toSignal, type WritableSignal } from "@kayahr/signal";
+import { type Signal, type SignalSource, type WritableSignal, computed, signal, toSignal } from "@kayahr/signal";
 
-import type { Element } from "../utils/types.js";
+import type { Element } from "../utils/types.ts";
 
 /**
  * Properties for {@link For} component.
@@ -47,30 +47,28 @@ export function For<T>({ each, children }: ForProperties<T>): Element {
     let cache = new CacheStack<unknown, { element: Element, indexSignal: WritableSignal<number> }>();
     let oldCache: typeof cache | null = cache;
     const source = each instanceof Array ? signal(each) : toSignal(each);
-    const items = computed(() => {
-        return source.get()?.map((item, index, items) => {
-            if (index === 0) {
-                // Swap cache on first element for automatic cleanup
-                oldCache = cache;
-                cache = new CacheStack<unknown, { element: Element, indexSignal: WritableSignal<number> }>();
-            }
-            const entry = oldCache?.pop(item);
-            let element: Element;
-            if (entry == null) {
-                const indexSignal = signal(index);
-                element = children(item, indexSignal);
-                cache.push(item, { element, indexSignal });
-            } else {
-                element = entry.element;
-                entry.indexSignal.set(index);
-                cache.push(item, entry);
-            }
-            if (index === items.length - 1) {
-                // Remove old cache when last item is reached for automatic cleanup
-                oldCache = null;
-            }
-            return element;
-        });
-    });
+    const items = computed(() => source.get()?.map((item, index, items) => {
+        if (index === 0) {
+            // Swap cache on first element for automatic cleanup
+            oldCache = cache;
+            cache = new CacheStack<unknown, { element: Element, indexSignal: WritableSignal<number> }>();
+        }
+        const entry = oldCache?.pop(item);
+        let element: Element;
+        if (entry == null) {
+            const indexSignal = signal(index);
+            element = children(item, indexSignal);
+            cache.push(item, { element, indexSignal });
+        } else {
+            element = entry.element;
+            entry.indexSignal.set(index);
+            cache.push(item, entry);
+        }
+        if (index === items.length - 1) {
+            // Remove old cache when last item is reached for automatic cleanup
+            oldCache = null;
+        }
+        return element;
+    }));
     return <>{items}</>;
 }

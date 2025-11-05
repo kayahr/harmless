@@ -6,7 +6,7 @@
 import type { Observable } from "@kayahr/observable";
 import type { Signal } from "@kayahr/signal";
 
-import type { JSXElement } from "../JSXElement.js";
+import type { JSXElement } from "../JSXElement.ts";
 
 /** Plain object recursively only allowing values of type {@link Element}. */
 export interface ElementObject extends Record<string | symbol, Element> {}
@@ -16,4 +16,4 @@ export type Element = JSXElement | Node | Signal<Element> | (() => Element) |  b
     | Promise<Element> | Observable<Element> | ElementObject;
 
 /** Component properties base type. */
-export type Properties = Record<string, unknown>;
+export interface Properties extends Record<string, unknown> {}

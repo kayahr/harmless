@@ -4,12 +4,13 @@
  */
 
 import { Context, injectable } from "@kayahr/cdi";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { component } from "../../main/utils/component.js";
-import { render } from "../../main/utils/render.js";
-import type { Element } from "../../main/utils/types.js";
-import { sleep } from "../support.js";
+import { component } from "../../main/utils/component.ts";
+import { render } from "../../main/utils/render.ts";
+import type { Element } from "../../main/utils/types.ts";
+import { sleep } from "../support.ts";
+import { assertDefined, assertSame } from "@kayahr/assert";
 
 class DepA { public a = 1; };
 class DepB { public b = 2; };
@@ -38,7 +39,7 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<Component />));
-        expect(root.innerHTML).toBe("<!--<>-->53 John<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->53 John<!--</>-->");
     });
 
     it("can be used as a function to set class component options", () => {
@@ -64,7 +65,7 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<Component />));
-        expect(root.innerHTML).toBe("<!--<>-->53 John<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->53 John<!--</>-->");
     });
 
     it("can be used as a function to set function component options", () => {
@@ -86,7 +87,7 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<Component />));
-        expect(root.innerHTML).toBe("<!--<>-->53 John<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->53 John<!--</>-->");
     });
 
     it("can inject async dependencies into function component", async () => {
@@ -112,10 +113,10 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<>:<Component />:</>));
-        expect(root.innerHTML).toBe("<!--<>-->:<!---->:<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->:<!---->:<!--</>-->");
         await Context.getActive().getAsync(Service);
         await sleep(); // Wait a macro task to give promises time to settle
-        expect(root.innerHTML).toBe("<!--<>-->:<!--<>-->53 John<!--</>-->:<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->:<!--<>-->53 John<!--</>-->:<!--</>-->");
     });
 
     it("can inject async dependencies into class component", async () => {
@@ -145,15 +146,15 @@ describe("component", () => {
 
         const root = document.createElement("div");
         root.appendChild(render(<>:<Component />:</>));
-        expect(root.innerHTML).toBe("<!--<>-->:<!---->:<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->:<!---->:<!--</>-->");
         await Context.getActive().getAsync(Service);
         await sleep(); // Wait a macro task to give promises time to settle
-        expect(root.innerHTML).toBe("<!--<>-->:<!--<>-->53 John<!--</>-->:<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->:<!--<>-->53 John<!--</>-->:<!--</>-->");
     });
 
     it("requires compatible inject array when used as a class decorator", () => {
         // Wrapped into function which is never called because this test is a compiler only test
-        return function () {
+        const dummy = () => {
             // @ts-expect-error Must not compile because inject array is empty
             @component({ inject: [] })
             class Test1 {
@@ -179,7 +180,7 @@ describe("component", () => {
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because inject option is missing
-            @component({ })
+            @component({})
             class Test5 {
                 public constructor(public props: unknown, public a: DepA, public b: DepB) {}
                 public render(): Element { return <></>; }
@@ -210,13 +211,16 @@ describe("component", () => {
             }
 
             // Dummy line to silence "defined but not used" warnings
-            expect([ Test1, Test2, Test3, Test4, Test5, Test6, Test7, Test8, Test9 ]).toBeDefined();
+            assertDefined([ Test1, Test2, Test3, Test4, Test5, Test6, Test7, Test8, Test9 ]);
         };
+
+        // Dummy line to silence unused warning
+        assertDefined(dummy);
     });
 
     it("requires compatible component class when used as a class decorator", () => {
         // Wrapped into function which is never called because this test is a compiler only test
-        return function () {
+        const dummy = () => {
             // @ts-expect-error Must not compile because class is not a JSX element class (render method missing)
             @component({ inject: [ DepA, DepB ] })
             class Test1 {
@@ -230,13 +234,16 @@ describe("component", () => {
             }
 
             // Dummy line to silence "defined but not used" warnings
-            expect([ Test1, Test2 ]).toBeDefined();
+            assertDefined([ Test1, Test2 ]);
         };
+
+        // Dummy line to silence unused warning
+        assertDefined(dummy);
     });
 
     it("requires compatible inject array when used as a function to register a class component", () => {
         // Wrapped into function which is never called because this test is a compiler only test
-        return function () {
+        const dummy = () => {
             class Test1 {
                 public constructor(public props: unknown, public a: DepA, public b: DepB) {}
                 public render(): Element { return <></>; }
@@ -270,7 +277,7 @@ describe("component", () => {
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because inject option is missing
-            component(Test5, { });
+            component(Test5, {});
 
             class Test6 {
                 public constructor(public props: unknown, public a: DepA, public b: DepB) {}
@@ -294,13 +301,16 @@ describe("component", () => {
             component(Test8, { inject: [ "props", DepA, DepB ] });
 
             // Dummy line to silence "defined but not used" warnings
-            expect([ Test1, Test2, Test3, Test4, Test5, Test6, Test7, Test8 ]).toBeDefined();
+            assertDefined([ Test1, Test2, Test3, Test4, Test5, Test6, Test7, Test8 ]);
         };
+
+        // Dummy line to silence unused warning
+        assertDefined(dummy);
     });
 
     it("requires compatible component class when used as a function to register a class component", () => {
         // Wrapped into function which is never called because this test is a compiler only test
-        return function () {
+        const dummy = () => {
             class Test1 {
                 public constructor(public props: unknown, public a: DepA, public b: DepB) {}
             }
@@ -315,13 +325,16 @@ describe("component", () => {
             component(Test2, { inject: [ DepA, DepB ] });
 
             // Dummy line to silence "defined but not used" warnings
-            expect([ Test1, Test2 ]).toBeDefined();
+            assertDefined([ Test1, Test2 ]);
         };
+
+        // Dummy line to silence unused warning
+        assertDefined(dummy);
     });
 
     it("requires compatible inject array when used to register a function component", () => {
         // Wrapped into function which is never called because this test is a compiler only test
-        return function () {
+        const dummy = () => {
             function Test1(props: unknown, a: DepA, b: DepB) {
                 return <></>;
             }
@@ -350,7 +363,7 @@ describe("component", () => {
                 return <></>;
             }
             // @ts-expect-error Must not compile because inject option is missing
-            component(Test5, { });
+            component(Test5, {});
 
             function Test6(props: unknown, a: DepA, b: DepB) {
                 return <></>;
@@ -371,19 +384,25 @@ describe("component", () => {
             component(Test8, { inject: [ "props", DepA, DepB ] });
 
             // Dummy line to silence "defined but not used" warnings
-            expect([ Test1, Test2, Test3, Test4, Test5, Test6, Test7, Test8 ]).toBeDefined();
+            assertDefined([ Test1, Test2, Test3, Test4, Test5, Test6, Test7, Test8 ]);
         };
+
+        // Dummy line to silence unused warning
+        assertDefined(dummy);
     });
 
     it("requires compatible component function when used as to register a function component", () => {
         // Wrapped into function which is never called because this test is a compiler only test
-        return function () {
+        const dummy = () => {
             function Test1(props: unknown, a: DepA, b: DepB) {
                 return "test";
             }
 
             // Dummy line to silence "defined but not used" warnings
-            expect([ Test1 ]).toBeDefined();
+            assertDefined([ Test1 ]);
         };
+
+        // Dummy line to silence unused warning
+        assertDefined(dummy);
     });
 });

@@ -3,8 +3,8 @@
  * See LICENSE.md for licensing information
  */
 
-import { getChildComponent, getChildRenderings } from "../utils/children.js";
-import type { Element } from "../utils/types.js";
+import { getChildComponent, getChildRenderings } from "../utils/children.ts";
+import type { Element } from "../utils/types.ts";
 
 /**
  * Renders the first {@link When} child component matching its test expression. If no {@link When} child matches then the {@link Otherwise} child is

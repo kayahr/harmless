@@ -5,8 +5,8 @@
 
 import { Context } from "@kayahr/cdi";
 
-import { Component } from "./Component.js";
-import type { Element, Properties } from "./utils/types.js";
+import { Component } from "./Component.ts";
+import type { Element, Properties } from "./utils/types.ts";
 
 /** Type of a function creating a JSX Element. */
 export type ComponentFunction<T extends Properties = Properties, R extends Element = Element> = (props: T, ...injects: any[]) => R;
@@ -29,7 +29,7 @@ export class FunctionComponent<T extends ComponentFunction<P, R>, P extends Prop
         this.#properties = properties;
     }
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     protected doRender(): R | Promise<R> {
         const context = Context.getActive();
         if (context.has(this.source)) {
@@ -39,10 +39,11 @@ export class FunctionComponent<T extends ComponentFunction<P, R>, P extends Prop
             if (func instanceof Promise) {
                 // When resolved function is asynchronous because one of its dependencies is asynchronous then insert placeholder node
                 // and replace it later when promise is resolved
-                return func.then(func => {
+                return (async () => {
+                    const syncFunc = await func;
                     // Render the now resolved component function in the signal scope of this function element
-                    return this.runInContext(() => func(this.#properties));
-                }) as Promise<R>;
+                    return this.runInContext(() => syncFunc(this.#properties));
+                })();
             } else {
                 // Component function was resolved synchronously, so call it synchronously
                 return this.runInContext(() => func(this.#properties));

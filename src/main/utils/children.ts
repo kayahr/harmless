@@ -1,5 +1,5 @@
-import { Component, ComponentSource } from "../Component.js";
-import type { Element, Properties } from "./types.js";
+import { Component, type ComponentSource } from "../Component.ts";
+import type { Element, Properties } from "./types.ts";
 
 export function getChildComponents<T extends ComponentSource<P, R>, P extends Properties, R extends Element>(children: Element,
         source: T & ComponentSource<P, R>): Array<Component<T, P, R>> {

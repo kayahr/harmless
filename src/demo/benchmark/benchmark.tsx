@@ -1,5 +1,5 @@
 import { For, type JSX, render } from "@kayahr/harmless";
-import { arraySignal, atomic, signal, type WritableSignal } from "@kayahr/signal";
+import { type WritableSignal, arraySignal, atomic, signal } from "@kayahr/signal";
 
 const adjectives = [
     "pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful",
@@ -18,7 +18,7 @@ interface Data {
 }
 
 const buildData = (count: number) => {
-    const data = new Array(count) as Data[];
+    const data = Array.from<Data>({ length: count });
     for (let i = 0; i < count; i++) {
         const label = signal(
             `${adjectives[random(adjectives.length)]} ${colors[random(colors.length)]} ${nouns[random(nouns.length)]}`
@@ -45,15 +45,15 @@ document.getElementById("main")?.appendChild(render(() => {
     const update = () =>
         atomic(() => {
             for (let i = 0, d = data.get(), len = d.length; i < len; i += 10) {
-                d[i]?.label.update(l => l + " !!!");
+                d[i]?.label.update(l => `${l} !!!`);
             }
         });
     const clear = () => data.set([]);
     const swapRows = () => {
         if (data.length > 998) {
-            const item = data.at(1) as Data;
+            const item = data.at(1)!;
             atomic(() => {
-                data.setAt(1, data.at(998) as Data);
+                data.setAt(1, data.at(998)!);
                 data.setAt(998, item);
             });
         }

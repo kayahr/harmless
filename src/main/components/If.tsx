@@ -5,7 +5,7 @@
 
 import { type SignalSource, toSignal } from "@kayahr/signal";
 
-import type { Element } from "../utils/types.js";
+import type { Element } from "../utils/types.ts";
 
 /**
  * Properties for the {@link If} component.

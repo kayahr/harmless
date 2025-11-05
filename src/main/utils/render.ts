@@ -3,9 +3,9 @@
  * See LICENSE.md for licensing information.
  */
 
-import { Component } from "../Component.js";
-import { ValueElement } from "../ValueElement.js";
-import type { Element } from "./types.js";
+import { Component } from "../Component.ts";
+import { ValueElement } from "../ValueElement.ts";
+import type { Element } from "./types.ts";
 
 /**
  * Renders the given JSX Element into a DOM node and returns it. This node should be added to the DOM or some other static HTML element immediately or

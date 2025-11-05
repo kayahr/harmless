@@ -5,7 +5,7 @@
 
 import { signal } from "@kayahr/signal";
 
-import { render } from "../../main/utils/render.js";
+import { render } from "../../main/utils/render.ts";
 
 // In this example a signal is used to count the number of button clicks and reactively update the displayed count.
 

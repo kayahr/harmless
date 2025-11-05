@@ -5,22 +5,22 @@
 
 import { Context } from "@kayahr/cdi";
 import { Observable } from "@kayahr/observable";
-import { ReadonlySignal, signal, toSignal, type WritableSignal } from "@kayahr/signal";
+import { ReadonlySignal, type WritableSignal, signal, toSignal } from "@kayahr/signal";
 
-import { getChildRenderings } from "../utils/children.js";
-import { escapeRegExp } from "../utils/regexp.js";
-import type { Element } from "../utils/types.js";
+import { getChildRenderings } from "../utils/children.ts";
+import { escapeRegExp } from "../utils/regexp.ts";
+import type { Element } from "../utils/types.ts";
 
 /** Signal reporting the current path read from location hash. If hash does not start with a slash then a slash is prepended. */
 const currentPath = toSignal(new Observable<string>(observer => {
     const getHash = () => {
-        const path = window.location.hash.substring(1);
+        const path = globalThis.location.hash.substring(1);
         return path.startsWith("/") ? path : `/${path}`;
     };
     const listener = () => observer.next(getHash());
     observer.next(getHash());
-    window.addEventListener("popstate", listener);
-    return () => window.removeEventListener("popstate", listener);
+    globalThis.addEventListener("popstate", listener);
+    return () => globalThis.removeEventListener("popstate", listener);
 }), { requireSync: true });
 
 /**
@@ -37,7 +37,7 @@ function createPathPattern(s: string): RegExp {
             const pattern = `\\/(?<${optional ? part.substring(0, part.length - 1) : part}>[^/]*)`;
             return optional ? `(?:${pattern})?` : pattern;
         } else {
-            return escapeRegExp("/" + part);
+            return escapeRegExp(`/${part}`);
         }
     }).join("")}$`);
 }
@@ -122,5 +122,5 @@ export interface AProperties {
  */
 export function A({ href, activeClass, inactiveClass, children }: AProperties): Element {
     const pattern = createPathPattern(href);
-    return <a href={"#" + href} class={() => (isActivePath(pattern) ? activeClass : inactiveClass) ?? ""}>{children}</a>;
+    return <a href={`#${href}`} class={() => (isActivePath(pattern) ? activeClass : inactiveClass) ?? ""}>{children}</a>;
 }

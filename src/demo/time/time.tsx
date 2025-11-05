@@ -7,7 +7,7 @@
 
 import { Observable } from "@kayahr/observable";
 
-import { render } from "../../main/utils/render.js";
+import { render } from "../../main/utils/render.ts";
 
 // There are shorter ways to create a timer observable, for example with an RxJS's timer,
 // but let's keep it as raw as possible here

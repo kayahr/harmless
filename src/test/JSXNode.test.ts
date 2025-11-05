@@ -3,14 +3,15 @@
  * See LICENSE.md for licensing information
  */
 
-import "@kayahr/vitest-matchers";
+import { describe, it } from "node:test";
 
-import { describe, expect, it, vi } from "vitest";
-
-import { IntrinsicElement } from "../main/IntrinsicElement.js";
-import { JSXElement } from "../main/JSXElement.js";
-import { addNodeReplaceListener, connectElement, destroyElement, replaceNode } from "../main/JSXNode.js";
-import { createFragment, dump } from "./support.js";
+import { IntrinsicElement } from "../main/IntrinsicElement.ts";
+import { JSXElement } from "../main/JSXElement.ts";
+import { RangeFragment, RangeFragmentEnd, RangeFragmentStart, addNodeReplaceListener, connectElement, destroyElement, replaceNode } from "../main/JSXNode.ts";
+import { createFragment, dump } from "./support.ts";
+import { assertInstanceOf, assertNotThrow, assertSame } from "@kayahr/assert";
+import { ValueElement } from "../main/ValueElement.ts";
+import { FragmentElement } from "../main/FragmentElement.ts";
 
 describe("connectElement", () => {
     it("connects a JSX element to a DOM node", () => {
@@ -27,43 +28,43 @@ describe("connectElement", () => {
             }
         }();
         connectElement(node, element);
-        expect(element.destroyed).toBe(false);
+        assertSame(element.destroyed, false);
         destroyElement(node);
-        expect(element.destroyed).toBe(true);
+        assertSame(element.destroyed, true);
     });
     it("returns the given node", () => {
         const node = document.createElement("div");
         const element = new IntrinsicElement("div", {}, []);
-        expect(connectElement(node, element)).toBe(node);
+        assertSame(connectElement(node, element), node);
     });
 });
 
 describe("replaceNode", () => {
-    it("does nothing when replacing node with itself", () => {
+    it("does nothing when replacing node with itself", (context) => {
         const element = new IntrinsicElement("span", {}, []);
         const node = element.createNode();
         const root = document.createElement("body");
         root.appendChild(node);
-        const onDestroy = vi.spyOn(element, "destroy");
+        const onDestroy = context.mock.method(element, "destroy");
         replaceNode(node, node);
-        expect(onDestroy).not.toHaveBeenCalled();
-        expect(node.parentNode).toBe(root);
+        assertSame(onDestroy.mock.callCount(), 0);
+        assertSame(node.parentNode, root);
     });
     it("does nothing when old DOM element has no parent", () => {
         const root = document.createElement("body");
         const div = document.createElement("div");
         const span = document.createElement("span");
         root.appendChild(span);
-        expect(() => replaceNode(div, span)).not.toThrow();
-        expect(dump(root)).toBe("<body><span></span></body>");
+        assertNotThrow(() => replaceNode(div, span), );
+        assertSame(dump(root), "<body><span></span></body>");
     });
     it("does nothing when old node is disconnected fragment", () => {
         const root = document.createElement("body");
         const frag = createFragment();
         const span = document.createElement("span");
         root.appendChild(span);
-        expect(() => replaceNode(frag, span)).not.toThrow();
-        expect(dump(root)).toBe("<body><span></span></body>");
+        assertNotThrow(() => replaceNode(frag, span), );
+        assertSame(dump(root), "<body><span></span></body>");
     });
     it("can replace DOM element with fragment", () => {
         const root = document.createElement("body");
@@ -72,7 +73,7 @@ describe("replaceNode", () => {
         const frag = createFragment("frag");
         frag.appendChild(document.createTextNode("Test"));
         replaceNode(div, frag);
-        expect(dump(root)).toBe("<body><frag>Test</frag></body>");
+        assertSame(dump(root), "<body><frag>Test</frag></body>");
     });
     it("can replace DOM element with DOM element", () => {
         const root = document.createElement("body");
@@ -81,7 +82,7 @@ describe("replaceNode", () => {
         const span = document.createElement("span");
         span.appendChild(document.createTextNode("Test"));
         replaceNode(div, span);
-        expect(dump(root)).toBe("<body><span>Test</span></body>");
+        assertSame(dump(root), "<body><span>Test</span></body>");
     });
     it("can replace fragment with DOM element", () => {
         const root = document.createElement("body");
@@ -91,8 +92,8 @@ describe("replaceNode", () => {
         const div = document.createElement("div");
         root.appendChild(div);
         replaceNode(frag, div);
-        expect(dump(root)).toBe("<body><div></div></body>");
-        expect(dump(frag)).toBe("<frag>Test</frag>");
+        assertSame(dump(root), "<body><div></div></body>");
+        assertSame(dump(frag), "<frag>Test</frag>");
     });
     it("can replace fragment with fragment", () => {
         const root = document.createElement("body");
@@ -102,25 +103,194 @@ describe("replaceNode", () => {
         const frag2 = createFragment("frag2");
         frag2.appendChild(document.createTextNode("Test2"));
         replaceNode(frag1, frag2);
-        expect(dump(root)).toBe("<body><frag2>Test2</frag2></body>");
-        expect(dump(frag1)).toBe("<frag1>Test1</frag1>");
+        assertSame(dump(root), "<body><frag2>Test2</frag2></body>");
+        assertSame(dump(frag1), "<frag1>Test1</frag1>");
     });
-    it("calls replace listeners once", () => {
+    it("calls replace listeners once", (context) => {
         const oldNode = document.createElement("div");
         const newNode = document.createElement("span");
-        const listener1 = vi.fn();
-        const listener2 = vi.fn();
+        const listener1 = context.mock.fn();
+        const listener2 = context.mock.fn();
         addNodeReplaceListener(oldNode, listener1);
         addNodeReplaceListener(oldNode, listener2);
-        expect(listener1).not.toHaveBeenCalled();
-        expect(listener2).not.toHaveBeenCalled();
+        assertSame(listener1.mock.callCount(), 0);
+        assertSame(listener2.mock.callCount(), 0);
         replaceNode(oldNode, newNode);
-        expect(listener1).toHaveBeenCalledExactlyOnceWith(newNode);
-        expect(listener2).toHaveBeenCalledExactlyOnceWith(newNode);
-        listener1.mockClear();
-        listener2.mockClear();
+        assertSame(listener1.mock.callCount(), 1);
+        assertSame(listener1.mock.calls[0].arguments[0], newNode);
+        assertSame(listener2.mock.callCount(), 1);
+        assertSame(listener2.mock.calls[0].arguments[0], newNode);
+        listener1.mock.resetCalls();
+        listener2.mock.resetCalls();
         replaceNode(oldNode, newNode);
-        expect(listener1).not.toHaveBeenCalled();
-        expect(listener2).not.toHaveBeenCalled();
+        assertSame(listener1.mock.callCount(), 0);
+        assertSame(listener2.mock.callCount(), 0);
+    });
+});
+
+describe("RangeFragment", () => {
+    it("extends DocumentFragment", () => {
+        assertInstanceOf(new RangeFragment(), DocumentFragment);
+    });
+
+    describe("constructor", () => {
+        it("creates and appends two empty text nodes as start and end anchors", () => {
+            const fragment = new RangeFragment();
+            assertSame(fragment.childNodes.length, 2);
+            assertInstanceOf(fragment.childNodes[0], RangeFragmentStart);
+            assertInstanceOf(fragment.childNodes[1], RangeFragmentEnd);
+            assertSame(fragment.childNodes[0].textContent, "<>");
+            assertSame(fragment.childNodes[1].textContent, "</>");
+            assertSame(fragment.childNodes[0].ownerFragment, fragment);
+            assertSame(fragment.childNodes[1].ownerFragment, fragment);
+        });
+    });
+
+    describe("appendChild", () => {
+        it("returns the appended element", () => {
+            const fragment = createFragment();
+            const node = document.createElement("div");
+            assertSame(fragment.appendChild(node), node);
+        });
+        it("returns the appended fragment", () => {
+            const fragment = createFragment();
+            const node = createFragment();
+            assertSame(fragment.appendChild(node), node);
+        });
+    });
+
+    describe("remove", () => {
+        it("does nothing when fragment is not anchored", () => {
+            const fragment = createFragment();
+            const child1 = document.createTextNode("1");
+            const child2 = document.createTextNode("2");
+            fragment.appendChild(child1);
+            fragment.appendChild(child2);
+            fragment.remove();
+            assertSame(dump(fragment), "<>12</>");
+        });
+        it("moves anchored elements back into the fragment", () => {
+            const root = document.createElement("body");
+            const fragment = createFragment();
+            const child1 = document.createTextNode("1");
+            const child2 = document.createTextNode("2");
+            fragment.appendChild(child1);
+            fragment.appendChild(child2);
+            root.appendChild(fragment);
+            assertSame(dump(root), "<body><>12</></body>");
+            fragment.remove();
+            assertSame(dump(root), "<body></body>");
+            assertSame(root.childNodes.length, 0);
+        });
+        it("moves elements of removed child fragment back from not anchored parent into child fragment", () => {
+            const parent = createFragment("parent");
+            parent.appendChild(document.createTextNode("a"));
+            const child = createFragment("child");
+            child.appendChild(document.createTextNode("1"));
+            parent.appendChild(child);
+            child.appendChild(document.createTextNode("2"));
+            parent.appendChild(document.createTextNode("b"));
+            assertSame(dump(parent), "<parent>a<child>12</child>b</parent>");
+            assertSame(dump(child), "");
+            child.remove();
+            assertSame(dump(parent), "<parent>ab</parent>");
+            assertSame(dump(child), "<child>12</child>");
+        });
+        it("moves elements of removed child fragment back from anchored parent into child fragment", () => {
+            const root = document.createElement("body");
+            const parent = createFragment("parent");
+            parent.appendChild(document.createTextNode("a"));
+            root.appendChild(parent);
+            const child = createFragment("child");
+            child.appendChild(document.createTextNode("1"));
+            parent.appendChild(child);
+            child.appendChild(document.createTextNode("2"));
+            parent.appendChild(document.createTextNode("b"));
+            assertSame(dump(root), "<body><parent>a<child>12</child>b</parent></body>");
+            assertSame(dump(parent), "");
+            assertSame(dump(child), "");
+            child.remove();
+            assertSame(dump(root), "<body><parent>ab</parent></body>");
+            assertSame(dump(parent), "");
+            assertSame(dump(child), "<child>12</child>");
+        });
+    });
+
+    describe("replaceWith", () => {
+        it("does nothing when replaced with itself", (context) => {
+            const root = document.createElement("body");
+            const fragment = new RangeFragment();
+            root.appendChild(fragment);
+            const onDestroy = context.mock.method(fragment, "destroy");
+            fragment.replaceWith(fragment);
+            assertSame(onDestroy.mock.callCount(), 0);
+        });
+        it("replaces a fragment with a new node", () => {
+            const root = document.createElement("body");
+            const fragment = createFragment();
+            const child1 = document.createTextNode("1");
+            const child2 = document.createTextNode("2");
+            fragment.appendChild(child1);
+            fragment.appendChild(child2);
+            root.appendChild(fragment);
+            assertSame(dump(root), "<body><>12</></body>");
+            fragment.replaceWith(child2);
+            assertSame(dump(root), "<body>2</body>");
+            assertSame(dump(fragment), "<>1</>");
+        });
+        it("replaces a child fragment with a new node", () => {
+            const root = document.createElement("body");
+            const parent = createFragment("parent");
+            const child = createFragment("child");
+            const a = document.createTextNode("a");
+            const b = document.createTextNode("b");
+            child.appendChild(a);
+            child.appendChild(b);
+            parent.appendChild(child);
+            root.appendChild(parent);
+            assertSame(dump(root), "<body><parent><child>ab</child></parent></body>");
+            child.replaceWith(b);
+            assertSame(dump(root), "<body><parent>b</parent></body>");
+            assertSame(dump(parent), "");
+            assertSame(dump(child), "<child>a</child>");
+        });
+    });
+    describe("destroy", () => {
+        it("does nothing when no children", () => {
+            const fragment = new RangeFragment();
+            assertNotThrow(() => fragment.destroy(), );
+        });
+        it("destroys single child element", (context) => {
+            const fragment = new RangeFragment();
+            const element = new ValueElement("test");
+            const onDestroy = context.mock.method(element, "destroy");
+            fragment.appendChild(element.createNode());
+            assertSame(onDestroy.mock.callCount(), 0);
+            fragment.destroy();
+            assertSame(onDestroy.mock.callCount(), 1);
+        });
+        it("destroys multiple child elements", (context) => {
+            const fragment = new RangeFragment();
+            const element1 = new ValueElement("test");
+            const onDestroy1 = context.mock.method(element1, "destroy");
+            const element2 = new ValueElement("test");
+            const onDestroy2 = context.mock.method(element2, "destroy");
+            fragment.appendChild(element1.createNode());
+            fragment.appendChild(element2.createNode());
+            assertSame(onDestroy1.mock.callCount(), 0);
+            assertSame(onDestroy2.mock.callCount(), 0);
+            fragment.destroy();
+            assertSame(onDestroy1.mock.callCount(), 1);
+            assertSame(onDestroy2.mock.callCount(), 1);
+        });
+        it("destroys nested fragment", (context) => {
+            const fragment = new RangeFragment();
+            const element = new FragmentElement([]);
+            const onDestroy = context.mock.method(element, "destroy");
+            fragment.appendChild(element.createNode());
+            assertSame(onDestroy.mock.callCount(), 0);
+            fragment.destroy();
+            assertSame(onDestroy.mock.callCount(), 1);
+        });
     });
 });

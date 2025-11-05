@@ -3,10 +3,9 @@
  * See LICENSE.md for licensing information.
  */
 
-import { JSXElement } from "./JSXElement.js";
-import { connectElement } from "./JSXNode.js";
-import { RangeFragment } from "./RangeFragment.js";
-import type { Element } from "./utils/types.js";
+import { JSXElement } from "./JSXElement.ts";
+import { RangeFragment, connectElement } from "./JSXNode.ts";
+import type { Element } from "./utils/types.ts";
 
 /**
  * JSX element for rendering a fragment.
@@ -25,7 +24,7 @@ export class FragmentElement extends JSXElement<RangeFragment> {
         this.#children = children instanceof Array ? children : [ children ];
     }
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     protected doRender(): RangeFragment {
         return connectElement(this.runInContext(() => new RangeFragment(this.#children.map(child => this.resolveNode(child)))), this);
     }

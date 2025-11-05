@@ -1,5 +1,5 @@
-import { JSXElement } from "./JSXElement.js";
-import type { Element } from "./utils/types.js";
+import { JSXElement } from "./JSXElement.ts";
+import type { Element } from "./utils/types.ts";
 
 export class ValueElement extends JSXElement {
     readonly #value: Element;

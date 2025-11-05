@@ -5,76 +5,77 @@
 
 import { Context } from "@kayahr/cdi";
 import { signal } from "@kayahr/signal";
-import { describe, expect, it, vi } from "vitest";
+import { describe, it } from "node:test";
 
-import { If } from "../../main/components/If.js";
-import { component } from "../../main/utils/component.js";
-import { onDestroy } from "../../main/utils/lifecycle.js";
-import { render } from "../../main/utils/render.js";
-import { sleep } from "../support.js";
+import { If } from "../../main/components/If.ts";
+import { component } from "../../main/utils/component.ts";
+import { onDestroy } from "../../main/utils/lifecycle.ts";
+import { render } from "../../main/utils/render.ts";
+import { sleep } from "../support.ts";
+import { assertGreaterThan, assertSame } from "@kayahr/assert";
 
 describe("If", () => {
     it("renders nothing if empty", () => {
         const condition = <If test={() => true}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--</>-->");
     });
     it("renders children when test expression returns true", () => {
         const condition = <If test={() => true}>{1}A</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->1A<!--</>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->1A<!--</>--><!--</>-->");
     });
     it("does not render children when test expression returns false", () => {
         const condition = <If test={() => false}>{1}A</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--</>-->");
     });
     it("renders the `then` parameter when test expression returns true", () => {
         const condition = <If test={() => true} then={1}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>-->1<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->1<!--</>-->");
     });
     it("renders the `then` parameter when test expression returns true and there is an else parameter", () => {
         const condition = <If test={() => true} then={1} else={2}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>-->1<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->1<!--</>-->");
     });
     it("renders the `then` parameter when test expression returns true and ignores children", () => {
         const condition = <If test={() => true} then={1}>3</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>-->1<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->1<!--</>-->");
     });
     it("renders the `else` parameter when test expression returns false", () => {
         const condition = <If test={() => false} then={1} else={2}>3</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>-->2<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->2<!--</>-->");
     });
     it("dynamically switches content", () => {
         const value = signal(0);
         const condition = <If test={() => value.get() === 1} else="fallback">children</If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(root.innerHTML).toBe("<!--<>-->fallback<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->fallback<!--</>-->");
         value.set(1);
-        expect(root.innerHTML).toBe("<!--<>-->children<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->children<!--</>-->");
         value.set(0);
-        expect(root.innerHTML).toBe("<!--<>-->fallback<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->fallback<!--</>-->");
         value.set(1);
-        expect(root.innerHTML).toBe("<!--<>-->children<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->children<!--</>-->");
     });
-    it("initializes single shown component and destroys single hidden component", () => {
+    it("initializes single shown component and destroys single hidden component", (context) => {
         const value = signal(0);
-        const initThen = vi.fn();
-        const destroyThen = vi.fn();
-        const initElse = vi.fn();
-        const destroyElse = vi.fn();
+        const initThen = context.mock.fn();
+        const destroyThen = context.mock.fn();
+        const initElse = context.mock.fn();
+        const destroyElse = context.mock.fn();
         function Then() {
             initThen();
             onDestroy(destroyThen);
@@ -88,49 +89,49 @@ describe("If", () => {
         const condition = <If test={() => value.get() === 0} then={<Then />} else={<Else />}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(initThen).toHaveBeenCalledOnce();
-        expect(initElse).not.toHaveBeenCalled();
-        expect(destroyThen).not.toHaveBeenCalled();
-        expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
-        initThen.mockClear();
+        assertSame(initThen.mock.callCount(), 1);
+        assertSame(initElse.mock.callCount(), 0);
+        assertSame(destroyThen.mock.callCount(), 0);
+        assertSame(destroyElse.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->then<!--</>-->");
+        initThen.mock.resetCalls();
 
         value.set(1);
-        expect(initThen).not.toHaveBeenCalled();
-        expect(initElse).toHaveBeenCalledOnce();
-        expect(destroyThen).toHaveBeenCalledOnce();
-        expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
-        initElse.mockClear();
-        destroyThen.mockClear();
+        assertSame(initThen.mock.callCount(), 0);
+        assertSame(initElse.mock.callCount(), 1);
+        assertSame(destroyThen.mock.callCount(), 1);
+        assertSame(destroyElse.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->else<!--</>-->");
+        initElse.mock.resetCalls();
+        destroyThen.mock.resetCalls();
 
         value.set(0);
-        expect(initThen).toHaveBeenCalled();
-        expect(initElse).not.toHaveBeenCalled();
-        expect(destroyThen).not.toHaveBeenCalled();
-        expect(destroyElse).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
-        initThen.mockClear();
-        destroyElse.mockClear();
+        assertGreaterThan(initThen.mock.callCount(), 0);
+        assertSame(initElse.mock.callCount(), 0);
+        assertSame(destroyThen.mock.callCount(), 0);
+        assertSame(destroyElse.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>-->then<!--</>-->");
+        initThen.mock.resetCalls();
+        destroyElse.mock.resetCalls();
 
         value.set(1);
-        expect(initThen).not.toHaveBeenCalled();
-        expect(initElse).toHaveBeenCalledOnce();
-        expect(destroyThen).toHaveBeenCalledOnce();
-        expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
+        assertSame(initThen.mock.callCount(), 0);
+        assertSame(initElse.mock.callCount(), 1);
+        assertSame(destroyThen.mock.callCount(), 1);
+        assertSame(destroyElse.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->else<!--</>-->");
     });
 
-    it("initializes multiple shown components and destroys multiple hidden components", () => {
+    it("initializes multiple shown components and destroys multiple hidden components", (context) => {
         const value = signal(0);
-        const initThen1 = vi.fn();
-        const destroyThen1 = vi.fn();
-        const initThen2 = vi.fn();
-        const destroyThen2 = vi.fn();
-        const initElse1 = vi.fn();
-        const destroyElse1 = vi.fn();
-        const initElse2 = vi.fn();
-        const destroyElse2 = vi.fn();
+        const initThen1 = context.mock.fn();
+        const destroyThen1 = context.mock.fn();
+        const initThen2 = context.mock.fn();
+        const destroyThen2 = context.mock.fn();
+        const initElse1 = context.mock.fn();
+        const destroyElse1 = context.mock.fn();
+        const initElse2 = context.mock.fn();
+        const destroyElse2 = context.mock.fn();
         function Then1() {
             initThen1();
             onDestroy(destroyThen1);
@@ -154,66 +155,66 @@ describe("If", () => {
         const condition = <If test={() => value.get() === 0} then={<><Then1 /><Then2 /></>} else={<><Else1 /><Else2 /></>}></If>;
         const root = document.createElement("body");
         root.appendChild(render(condition));
-        expect(initThen1).toHaveBeenCalledOnce();
-        expect(initElse1).not.toHaveBeenCalled();
-        expect(destroyThen1).not.toHaveBeenCalled();
-        expect(destroyElse1).not.toHaveBeenCalled();
-        expect(initThen2).toHaveBeenCalledOnce();
-        expect(initElse2).not.toHaveBeenCalled();
-        expect(destroyThen2).not.toHaveBeenCalled();
-        expect(destroyElse2).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->then1<!--<>-->then2<!--</>--><!--</>--><!--</>-->");
-        initThen1.mockClear();
-        initThen2.mockClear();
+        assertSame(initThen1.mock.callCount(), 1);
+        assertSame(initElse1.mock.callCount(), 0);
+        assertSame(destroyThen1.mock.callCount(), 0);
+        assertSame(destroyElse1.mock.callCount(), 0);
+        assertSame(initThen2.mock.callCount(), 1);
+        assertSame(initElse2.mock.callCount(), 0);
+        assertSame(destroyThen2.mock.callCount(), 0);
+        assertSame(destroyElse2.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->then1<!--<>-->then2<!--</>--><!--</>--><!--</>-->");
+        initThen1.mock.resetCalls();
+        initThen2.mock.resetCalls();
 
         value.set(1);
-        expect(initThen1).not.toHaveBeenCalled();
-        expect(initElse1).toHaveBeenCalledOnce();
-        expect(destroyThen1).toHaveBeenCalledOnce();
-        expect(destroyElse1).not.toHaveBeenCalled();
-        expect(initThen2).not.toHaveBeenCalled();
-        expect(initElse2).toHaveBeenCalledOnce();
-        expect(destroyThen2).toHaveBeenCalledOnce();
-        expect(destroyElse2).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->else1<!--<>-->else2<!--</>--><!--</>--><!--</>-->");
-        initElse1.mockClear();
-        destroyThen1.mockClear();
-        initElse2.mockClear();
-        destroyThen2.mockClear();
+        assertSame(initThen1.mock.callCount(), 0);
+        assertSame(initElse1.mock.callCount(), 1);
+        assertSame(destroyThen1.mock.callCount(), 1);
+        assertSame(destroyElse1.mock.callCount(), 0);
+        assertSame(initThen2.mock.callCount(), 0);
+        assertSame(initElse2.mock.callCount(), 1);
+        assertSame(destroyThen2.mock.callCount(), 1);
+        assertSame(destroyElse2.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->else1<!--<>-->else2<!--</>--><!--</>--><!--</>-->");
+        initElse1.mock.resetCalls();
+        destroyThen1.mock.resetCalls();
+        initElse2.mock.resetCalls();
+        destroyThen2.mock.resetCalls();
 
         value.set(0);
-        expect(initThen1).toHaveBeenCalled();
-        expect(initElse1).not.toHaveBeenCalled();
-        expect(destroyThen1).not.toHaveBeenCalled();
-        expect(destroyElse1).toHaveBeenCalledOnce();
-        expect(initThen2).toHaveBeenCalled();
-        expect(initElse2).not.toHaveBeenCalled();
-        expect(destroyThen2).not.toHaveBeenCalled();
-        expect(destroyElse2).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->then1<!--<>-->then2<!--</>--><!--</>--><!--</>-->");
-        initThen1.mockClear();
-        destroyElse1.mockClear();
-        initThen2.mockClear();
-        destroyElse2.mockClear();
+        assertGreaterThan(initThen1.mock.callCount(), 0);
+        assertSame(initElse1.mock.callCount(), 0);
+        assertSame(destroyThen1.mock.callCount(), 0);
+        assertSame(destroyElse1.mock.callCount(), 1);
+        assertGreaterThan(initThen2.mock.callCount(), 0);
+        assertSame(initElse2.mock.callCount(), 0);
+        assertSame(destroyThen2.mock.callCount(), 0);
+        assertSame(destroyElse2.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->then1<!--<>-->then2<!--</>--><!--</>--><!--</>-->");
+        initThen1.mock.resetCalls();
+        destroyElse1.mock.resetCalls();
+        initThen2.mock.resetCalls();
+        destroyElse2.mock.resetCalls();
 
         value.set(1);
-        expect(initThen1).not.toHaveBeenCalled();
-        expect(initElse1).toHaveBeenCalledOnce();
-        expect(destroyThen1).toHaveBeenCalledOnce();
-        expect(destroyElse1).not.toHaveBeenCalled();
-        expect(initThen2).not.toHaveBeenCalled();
-        expect(initElse2).toHaveBeenCalledOnce();
-        expect(destroyThen2).toHaveBeenCalledOnce();
-        expect(destroyElse2).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->else1<!--<>-->else2<!--</>--><!--</>--><!--</>-->");
+        assertSame(initThen1.mock.callCount(), 0);
+        assertSame(initElse1.mock.callCount(), 1);
+        assertSame(destroyThen1.mock.callCount(), 1);
+        assertSame(destroyElse1.mock.callCount(), 0);
+        assertSame(initThen2.mock.callCount(), 0);
+        assertSame(initElse2.mock.callCount(), 1);
+        assertSame(destroyThen2.mock.callCount(), 1);
+        assertSame(destroyElse2.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->else1<!--<>-->else2<!--</>--><!--</>--><!--</>-->");
     });
 
-    it("initializes shown async components and destroys hidden async components", async () => {
+    it("initializes shown async components and destroys hidden async components", async (context) => {
         const value = signal(0);
-        const initThen = vi.fn();
-        const destroyThen = vi.fn();
-        const initElse = vi.fn();
-        const destroyElse = vi.fn();
+        const initThen = context.mock.fn();
+        const destroyThen = context.mock.fn();
+        const initElse = context.mock.fn();
+        const destroyElse = context.mock.fn();
         class DepA {
             public static create(): Promise<DepA> {
                 return Promise.resolve(new DepA());
@@ -242,39 +243,39 @@ describe("If", () => {
         const root = document.createElement("body");
         root.appendChild(render(condition));
         await sleep(0);
-        expect(initThen).toHaveBeenCalledOnce();
-        expect(initElse).not.toHaveBeenCalled();
-        expect(destroyThen).not.toHaveBeenCalled();
-        expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
-        initThen.mockClear();
+        assertSame(initThen.mock.callCount(), 1);
+        assertSame(initElse.mock.callCount(), 0);
+        assertSame(destroyThen.mock.callCount(), 0);
+        assertSame(destroyElse.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->then<!--</>-->");
+        initThen.mock.resetCalls();
 
         value.set(1);
         await sleep(0);
-        expect(initThen).not.toHaveBeenCalled();
-        expect(initElse).toHaveBeenCalledOnce();
-        expect(destroyThen).toHaveBeenCalledOnce();
-        expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
-        initElse.mockClear();
-        destroyThen.mockClear();
+        assertSame(initThen.mock.callCount(), 0);
+        assertSame(initElse.mock.callCount(), 1);
+        assertSame(destroyThen.mock.callCount(), 1);
+        assertSame(destroyElse.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->else<!--</>-->");
+        initElse.mock.resetCalls();
+        destroyThen.mock.resetCalls();
 
         value.set(0);
         await sleep(0);
-        expect(initThen).toHaveBeenCalled();
-        expect(initElse).not.toHaveBeenCalled();
-        expect(destroyThen).not.toHaveBeenCalled();
-        expect(destroyElse).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>-->then<!--</>-->");
-        initThen.mockClear();
-        destroyElse.mockClear();
+        assertGreaterThan(initThen.mock.callCount(), 0);
+        assertSame(initElse.mock.callCount(), 0);
+        assertSame(destroyThen.mock.callCount(), 0);
+        assertSame(destroyElse.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>-->then<!--</>-->");
+        initThen.mock.resetCalls();
+        destroyElse.mock.resetCalls();
 
         value.set(1);
         await sleep(0);
-        expect(initThen).not.toHaveBeenCalled();
-        expect(initElse).toHaveBeenCalledOnce();
-        expect(destroyThen).toHaveBeenCalledOnce();
-        expect(destroyElse).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->else<!--</>-->");
+        assertSame(initThen.mock.callCount(), 0);
+        assertSame(initElse.mock.callCount(), 1);
+        assertSame(destroyThen.mock.callCount(), 1);
+        assertSame(destroyElse.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->else<!--</>-->");
     });
 });

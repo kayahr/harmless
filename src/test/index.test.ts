@@ -3,27 +3,28 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { type ComponentClass } from "../main/ClassComponent.js";
-import { Choose, Otherwise, When, type WhenProperties } from "../main/components/Choose.js";
-import { For, type ForProperties } from "../main/components/For.js";
-import { If, type IfProperties } from "../main/components/If.js";
-import { A, type AProperties, Route, type RouteParams, type RouteProperties, Routes } from "../main/components/Route.js";
-import { Show, type ShowProperties } from "../main/components/Show.js";
-import { Context } from "../main/Context.js";
-import * as exports from "../main/index.js";
-import { JSXElement } from "../main/JSXElement.js";
-import { component, type ComponentOptions } from "../main/utils/component.js";
-import { onDestroy } from "../main/utils/lifecycle.js";
-import { ref, Reference } from "../main/utils/Reference.js";
-import { render } from "../main/utils/render.js";
-import { type Element, type ElementObject  } from "../main/utils/types.js";
+import type { ComponentClass } from "../main/ClassComponent.ts";
+import { Choose, Otherwise, When, type WhenProperties } from "../main/components/Choose.ts";
+import { For, type ForProperties } from "../main/components/For.ts";
+import { If, type IfProperties } from "../main/components/If.ts";
+import { A, type AProperties, Route, type RouteParams, type RouteProperties, Routes } from "../main/components/Route.ts";
+import { Show, type ShowProperties } from "../main/components/Show.ts";
+import { Context } from "../main/Context.ts";
+import * as exports from "../main/index.ts";
+import { JSXElement } from "../main/JSXElement.ts";
+import { type ComponentOptions, component } from "../main/utils/component.ts";
+import { onDestroy } from "../main/utils/lifecycle.ts";
+import { Reference, ref } from "../main/utils/Reference.ts";
+import { render } from "../main/utils/render.ts";
+import type { Element, ElementObject  } from "../main/utils/types.ts";
+import { assertEquals } from "@kayahr/assert";
 
 describe("index", () => {
     it("exports relevant types and functions and nothing more", () => {
         // Checks if runtime includes the expected exports and nothing else
-        expect({ ...exports }).toEqual({
+        assertEquals({ ...exports }, {
             component,
             JSXElement,
             Show,

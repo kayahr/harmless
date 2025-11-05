@@ -3,49 +3,50 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { escapeRegExp } from "../../main/utils/regexp.js";
+import { escapeRegExp } from "../../main/utils/regexp.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("escapeRegExp", () => {
     it("escape special characters to be used in regular expression strings", () => {
-        expect(escapeRegExp("/")).toBe("\\/");
-        expect(escapeRegExp("-")).toBe("\\x2d");
-        expect(escapeRegExp("\\")).toBe("\\\\");
-        expect(escapeRegExp("^")).toBe("\\^");
-        expect(escapeRegExp("$")).toBe("\\$");
-        expect(escapeRegExp("*")).toBe("\\*");
-        expect(escapeRegExp("+")).toBe("\\+");
-        expect(escapeRegExp("?")).toBe("\\?");
-        expect(escapeRegExp(".")).toBe("\\.");
-        expect(escapeRegExp("(")).toBe("\\(");
-        expect(escapeRegExp(")")).toBe("\\)");
-        expect(escapeRegExp("|")).toBe("\\|");
-        expect(escapeRegExp("[")).toBe("\\[");
-        expect(escapeRegExp("]")).toBe("\\]");
-        expect(escapeRegExp("{")).toBe("\\{");
-        expect(escapeRegExp("}")).toBe("\\}");
+        assertSame(escapeRegExp("/"), "\\/");
+        assertSame(escapeRegExp("-"), "\\x2d");
+        assertSame(escapeRegExp("\\"), "\\\\");
+        assertSame(escapeRegExp("^"), "\\^");
+        assertSame(escapeRegExp("$"), "\\$");
+        assertSame(escapeRegExp("*"), "\\*");
+        assertSame(escapeRegExp("+"), "\\+");
+        assertSame(escapeRegExp("?"), "\\?");
+        assertSame(escapeRegExp("."), "\\.");
+        assertSame(escapeRegExp("("), "\\(");
+        assertSame(escapeRegExp(")"), "\\)");
+        assertSame(escapeRegExp("|"), "\\|");
+        assertSame(escapeRegExp("["), "\\[");
+        assertSame(escapeRegExp("]"), "\\]");
+        assertSame(escapeRegExp("{"), "\\{");
+        assertSame(escapeRegExp("}"), "\\}");
     });
     it("uses fallback implementation when `Regexp.escape` not available", () => {
         const oldEscape = RegExp.escape;
         RegExp.escape = undefined;
         try {
-            expect(escapeRegExp("/")).toBe("\\/");
-            expect(escapeRegExp("-")).toBe("\\x2d");
-            expect(escapeRegExp("\\")).toBe("\\\\");
-            expect(escapeRegExp("^")).toBe("\\^");
-            expect(escapeRegExp("$")).toBe("\\$");
-            expect(escapeRegExp("*")).toBe("\\*");
-            expect(escapeRegExp("+")).toBe("\\+");
-            expect(escapeRegExp("?")).toBe("\\?");
-            expect(escapeRegExp(".")).toBe("\\.");
-            expect(escapeRegExp("(")).toBe("\\(");
-            expect(escapeRegExp(")")).toBe("\\)");
-            expect(escapeRegExp("|")).toBe("\\|");
-            expect(escapeRegExp("[")).toBe("\\[");
-            expect(escapeRegExp("]")).toBe("\\]");
-            expect(escapeRegExp("{")).toBe("\\{");
-            expect(escapeRegExp("}")).toBe("\\}");
+            assertSame(escapeRegExp("/"), "\\/");
+            assertSame(escapeRegExp("-"), "\\x2d");
+            assertSame(escapeRegExp("\\"), "\\\\");
+            assertSame(escapeRegExp("^"), "\\^");
+            assertSame(escapeRegExp("$"), "\\$");
+            assertSame(escapeRegExp("*"), "\\*");
+            assertSame(escapeRegExp("+"), "\\+");
+            assertSame(escapeRegExp("?"), "\\?");
+            assertSame(escapeRegExp("."), "\\.");
+            assertSame(escapeRegExp("("), "\\(");
+            assertSame(escapeRegExp(")"), "\\)");
+            assertSame(escapeRegExp("|"), "\\|");
+            assertSame(escapeRegExp("["), "\\[");
+            assertSame(escapeRegExp("]"), "\\]");
+            assertSame(escapeRegExp("{"), "\\{");
+            assertSame(escapeRegExp("}"), "\\}");
         } finally {
             RegExp.escape = oldEscape;
         }
@@ -54,7 +55,7 @@ describe("escapeRegExp", () => {
         const oldEscape = RegExp.escape;
         RegExp.escape = (v: string) => `_${v}`;
         try {
-            expect(escapeRegExp("/")).toBe("_/");
+            assertSame(escapeRegExp("/"), "_/");
         } finally {
             RegExp.escape = oldEscape;
         }

@@ -4,20 +4,21 @@
  */
 
 import { Context } from "@kayahr/cdi";
-import { describe, expect, it, type Mock, vi } from "vitest";
+import { type Mock, describe, it } from "node:test";
 
-import { Route, RouteParams, Routes } from "../../main/components/Route.js";
-import { component } from "../../main/utils/component.js";
-import { onDestroy } from "../../main/utils/lifecycle.js";
-import { render } from "../../main/utils/render.js";
-import { sleep } from "../support.js";
+import { Route, RouteParams, Routes } from "../../main/components/Route.ts";
+import { component } from "../../main/utils/component.ts";
+import { onDestroy } from "../../main/utils/lifecycle.ts";
+import { render } from "../../main/utils/render.ts";
+import { sleep } from "../support.ts";
+import { assertGreaterThan, assertSame } from "@kayahr/assert";
 
 describe("Routes", () => {
     it("renders empty node if empty", () => {
         const choose = <Routes></Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--</>-->");
     });
     it("renders first <Route> node that matches active path", () => {
         location.hash = "#/b";
@@ -31,7 +32,7 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
     });
     it("captures route parameters", () => {
         location.hash = "#/a/foo/bar";
@@ -44,7 +45,7 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->Foo: foo, Bar: bar<!--</>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->Foo: foo, Bar: bar<!--</>--><!--</>-->");
     });
     it("captures optional parameters", () => {
         location.hash = "#/a/foo";
@@ -57,9 +58,9 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->Foo: foo, Bar: <!--</>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->Foo: foo, Bar: <!--</>--><!--</>-->");
         location.hash = "#/a/foo/bar";
-        expect(root.innerHTML).toBe("<!--<>--><!--<>-->Foo: foo, Bar: bar<!--</>--><!--</>-->");
+        assertSame(root.innerHTML, "<!--<>--><!--<>-->Foo: foo, Bar: bar<!--</>--><!--</>-->");
     });
     it("dynamically switches routes", () => {
         location.hash = "#/";
@@ -73,19 +74,19 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(root.innerHTML).toBe("<!--<>-->Root<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->Root<!--</>-->");
         location.hash = "#/a";
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
         location.hash = "#/b";
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
         location.hash = "#/";
-        expect(root.innerHTML).toBe("<!--<>-->Root<!--</>-->");
+        assertSame(root.innerHTML, "<!--<>-->Root<!--</>-->");
     });
-    it("initializes shown components and destroys hidden components", () => {
-        const initA = vi.fn();
-        const destroyA = vi.fn();
-        const initB = vi.fn();
-        const destroyB = vi.fn();
+    it("initializes shown components and destroys hidden components", (context) => {
+        const initA = context.mock.fn();
+        const destroyA = context.mock.fn();
+        const initB = context.mock.fn();
+        const destroyB = context.mock.fn();
         function A() {
             initA();
             onDestroy(destroyA);
@@ -103,45 +104,45 @@ describe("Routes", () => {
         </Routes>;
         const root = document.createElement("body");
         root.appendChild(render(choose));
-        expect(initA).toHaveBeenCalledOnce();
-        expect(initB).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyB).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
+        assertSame(initA.mock.callCount(), 1);
+        assertSame(initB.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyB.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
 
         location.hash = "#/b";
-        expect(initA).not.toHaveBeenCalled();
-        expect(initB).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyB).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
-        initB.mockClear();
-        destroyA.mockClear();
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initB.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyB.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
+        initB.mock.resetCalls();
+        destroyA.mock.resetCalls();
 
         location.hash = "#/a";
-        expect(initA).toHaveBeenCalled();
-        expect(initB).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyB).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
-        destroyB.mockClear();
+        assertGreaterThan(initA.mock.callCount(), 0);
+        assertSame(initB.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyB.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
+        destroyB.mock.resetCalls();
 
         location.hash = "#/b";
-        expect(initA).not.toHaveBeenCalled();
-        expect(initB).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyB).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initB.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyB.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
     });
 
-    it("initializes shown async components and destroys hidden async components", async () => {
+    it("initializes shown async components and destroys hidden async components", async (context) => {
         location.hash = "#/a";
-        const initA = vi.fn();
-        const destroyA = vi.fn();
-        const initB = vi.fn();
-        const destroyB = vi.fn();
+        const initA = context.mock.fn();
+        const destroyA = context.mock.fn();
+        const initB = context.mock.fn();
+        const destroyB = context.mock.fn();
         class DepA {
             public static create(): Promise<DepA> {
                 return Promise.resolve(new DepA());
@@ -173,48 +174,48 @@ describe("Routes", () => {
         const root = document.createElement("body");
         root.appendChild(render(choose));
         await sleep(0);
-        expect(initA).toHaveBeenCalledOnce();
-        expect(initB).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyB).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
+        assertSame(initA.mock.callCount(), 1);
+        assertSame(initB.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyB.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
 
         location.hash = "#/b";
         await sleep(0);
-        expect(initA).not.toHaveBeenCalled();
-        expect(initB).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyB).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
-        initB.mockClear();
-        destroyA.mockClear();
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initB.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyB.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
+        initB.mock.resetCalls();
+        destroyA.mock.resetCalls();
 
         location.hash = "#/a";
         await sleep(0);
-        expect(initA).toHaveBeenCalled();
-        expect(initB).not.toHaveBeenCalled();
-        expect(destroyA).not.toHaveBeenCalled();
-        expect(destroyB).toHaveBeenCalledOnce();
-        expect(root.innerHTML).toBe("<!--<>-->A<!--</>-->");
-        initA.mockClear();
-        destroyB.mockClear();
+        assertGreaterThan(initA.mock.callCount(), 0);
+        assertSame(initB.mock.callCount(), 0);
+        assertSame(destroyA.mock.callCount(), 0);
+        assertSame(destroyB.mock.callCount(), 1);
+        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
+        initA.mock.resetCalls();
+        destroyB.mock.resetCalls();
 
         location.hash = "#/b";
         await sleep(0);
-        expect(initA).not.toHaveBeenCalled();
-        expect(initB).toHaveBeenCalledOnce();
-        expect(destroyA).toHaveBeenCalledOnce();
-        expect(destroyB).not.toHaveBeenCalled();
-        expect(root.innerHTML).toBe("<!--<>-->B<!--</>-->");
+        assertSame(initA.mock.callCount(), 0);
+        assertSame(initB.mock.callCount(), 1);
+        assertSame(destroyA.mock.callCount(), 1);
+        assertSame(destroyB.mock.callCount(), 0);
+        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
     });
-    it("correctly handles switching between parameterized and non-parameterized routes", () => {
-        const initRoot = vi.fn();
-        const destroyRoot = vi.fn();
-        const initParamsA = vi.fn();
-        const destroyParamsA = vi.fn();
-        const initParamsB = vi.fn();
-        const destroyParamsB = vi.fn();
+    it("correctly handles switching between parameterized and non-parameterized routes", (context) => {
+        const initRoot = context.mock.fn();
+        const destroyRoot = context.mock.fn();
+        const initParamsA = context.mock.fn();
+        const destroyParamsA = context.mock.fn();
+        const initParamsB = context.mock.fn();
+        const destroyParamsB = context.mock.fn();
 
         function Root() {
             initRoot();
@@ -248,16 +249,16 @@ describe("Routes", () => {
         const root = document.createElement("body");
         root.appendChild(render(choose));
 
-        function test(path: string, expected: string, ...calls: Mock[]): void {
+        function test(path: string, expected: string, ...calls: Array<Mock<Function>>): void {
             location.hash = path;
-            expect(root.innerHTML).toBe(`<!--<>-->${expected}<!--</>-->`);
-            expect(initRoot).toHaveBeenCalledTimes(calls.includes(initRoot) ? 1 : 0);
-            expect(initParamsA).toHaveBeenCalledTimes(calls.includes(initParamsA) ? 1 : 0);
-            expect(initParamsB).toHaveBeenCalledTimes(calls.includes(initParamsB) ? 1 : 0);
-            expect(destroyRoot).toHaveBeenCalledTimes(calls.includes(destroyRoot) ? 1 : 0);
-            expect(destroyParamsA).toHaveBeenCalledTimes(calls.includes(destroyParamsA) ? 1 : 0);
-            expect(destroyParamsB).toHaveBeenCalledTimes(calls.includes(destroyParamsB) ? 1 : 0);
-            calls.forEach(call => call.mockClear());
+            assertSame(root.innerHTML, `<!--<>-->${expected}<!--</>-->`);
+            assertSame(initRoot.mock.callCount(), calls.includes(initRoot) ? 1 : 0);
+            assertSame(initParamsA.mock.callCount(), calls.includes(initParamsA) ? 1 : 0);
+            assertSame(initParamsB.mock.callCount(), calls.includes(initParamsB) ? 1 : 0);
+            assertSame(destroyRoot.mock.callCount(), calls.includes(destroyRoot) ? 1 : 0);
+            assertSame(destroyParamsA.mock.callCount(), calls.includes(destroyParamsA) ? 1 : 0);
+            assertSame(destroyParamsB.mock.callCount(), calls.includes(destroyParamsB) ? 1 : 0);
+            calls.forEach(call => call.mock.resetCalls());
         }
         test("#/", "<!--<>-->Root<!--</>-->", initRoot);
         test("#/a/foo", "<!--<>-->ParamsA: foo<!--</>-->", destroyRoot, initParamsA);

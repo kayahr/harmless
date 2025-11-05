@@ -4,10 +4,11 @@
  */
 
 import { signal } from "@kayahr/signal";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
 
-import { Show } from "../../main/components/Show.js";
-import { render } from "../../main/utils/render.js";
+import { Show } from "../../main/components/Show.ts";
+import { render } from "../../main/utils/render.ts";
+import { assertSame } from "@kayahr/assert";
 
 describe("Show", () => {
     it("renders children if condition is true", () => {
@@ -18,7 +19,7 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
     });
     it("renders nothing if condition is false and there is no fallback", () => {
         const element = Show({
@@ -28,7 +29,7 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div><!--<>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--</>--></div>");
     });
     it("renders fallback if condition is false", () => {
         const element = Show({
@@ -39,7 +40,7 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
     });
     describe("dynamically changes rendering with arrays when condition changes", () => {
         const createTestValues = (condition: boolean) => ({
@@ -74,16 +75,16 @@ describe("Show", () => {
                     const root = document.createElement("div");
                     root.appendChild(node);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
                     when.set(false);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
                     when.set(true);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>--><!--<>-->is true<!--</>--><!--</>--></div>");
                     when.set(false);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>--><!--<>-->is false<!--</>--><!--</>--></div>");
                 });
             }
         }
@@ -122,16 +123,16 @@ describe("Show", () => {
                     const root = document.createElement("div");
                     root.appendChild(node);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>-->is true<!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>-->is true<!--</>--></div>");
                     when.set(false);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>-->is false<!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>-->is false<!--</>--></div>");
                     when.set(true);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>-->is true<!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>-->is true<!--</>--></div>");
                     when.set(false);
                     await wait();
-                    expect(root.outerHTML).toBe("<div><!--<>-->is false<!--</>--></div>");
+                    assertSame(root.outerHTML, "<div><!--<>-->is false<!--</>--></div>");
                 });
             }
         }
@@ -148,20 +149,20 @@ describe("Show", () => {
         const node = render(element);
         const root = document.createElement("div");
         root.appendChild(node);
-        expect(root.outerHTML).toBe("<div><!--<>-->fallback<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->fallback<!--</>--></div>");
         fallback.set("FALLBACK");
-        expect(root.outerHTML).toBe("<div><!--<>-->FALLBACK<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->FALLBACK<!--</>--></div>");
         children.set("CONTENT");
-        expect(root.outerHTML).toBe("<div><!--<>-->FALLBACK<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->FALLBACK<!--</>--></div>");
         when.set(true);
-        expect(root.outerHTML).toBe("<div><!--<>-->CONTENT<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->CONTENT<!--</>--></div>");
         when.set(false);
-        expect(root.outerHTML).toBe("<div><!--<>-->FALLBACK<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->FALLBACK<!--</>--></div>");
         when.set(true);
-        expect(root.outerHTML).toBe("<div><!--<>-->CONTENT<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->CONTENT<!--</>--></div>");
         children.set("Content");
         fallback.set("Fallback");
-        expect(root.outerHTML).toBe("<div><!--<>-->Content<!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>-->Content<!--</>--></div>");
     });
     it("dynamically switches nested Show components", () => {
         const childA1 = "Child A1";
@@ -176,14 +177,14 @@ describe("Show", () => {
         const rootShow = Show({ when: rootSwitch, children: showA, fallback: showB });
         const root = document.createElement("div");
         root.appendChild(render(rootShow));
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child A1<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->Child A1<!--</>--><!--</>--></div>");
         rootSwitch.set(false);
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child B1<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->Child B1<!--</>--><!--</>--></div>");
         switch1.set(false); // Should not affect the DOM yet because showA is not shown yet
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child B1<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->Child B1<!--</>--><!--</>--></div>");
         switch2.set(false);
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child B2<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->Child B2<!--</>--><!--</>--></div>");
         rootSwitch.set(true);
-        expect(root.outerHTML).toBe("<div><!--<>--><!--<>-->Child A2<!--</>--><!--</>--></div>");
+        assertSame(root.outerHTML, "<div><!--<>--><!--<>-->Child A2<!--</>--><!--</>--></div>");
     });
 });

@@ -5,7 +5,10 @@ jsxs
 kayahr
 lifecycles
 multilines
+ntest
+oxlint
 preloadicon
+registrator
 Reimer
 runlots
 smallpad

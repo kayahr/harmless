@@ -3,24 +3,25 @@
  * See LICENSE.md for licensing information
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, it } from "node:test";
 
-import { Context } from "../../main/Context.js";
-import { onDestroy } from "../../main/utils/lifecycle.js";
+import { Context } from "../../main/Context.ts";
+import { onDestroy } from "../../main/utils/lifecycle.ts";
+import { assertNotThrow, assertSame } from "@kayahr/assert";
 
 describe("onDestroy", () => {
     it("does nothing when no scope exists", () => {
-        expect(() => onDestroy(() => { throw Error("!"); })).not.toThrow();
+        assertNotThrow(() => onDestroy(() => { throw new Error("!"); }), );
     });
-    it("registers a destroy handler on the current scope", () => {
+    it("registers a destroy handler on the current scope", (context) => {
         const scope = new Context();
         const handler = scope.runInContext(() => {
-            const handler = vi.fn();
+            const handler = context.mock.fn();
             onDestroy(handler);
             return handler;
         });
-        expect(handler).not.toHaveBeenCalled();
+        assertSame(handler.mock.callCount(), 0);
         scope.destroy();
-        expect(handler).toHaveBeenCalledOnce();
+        assertSame(handler.mock.callCount(), 1);
     });
 });
