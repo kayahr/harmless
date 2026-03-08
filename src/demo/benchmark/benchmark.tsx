@@ -28,7 +28,7 @@ const buildData = (count: number) => {
     return data;
 };
 
-const Button = ({ id, children, fn }: { id: string, children: JSX.Element, fn: () => void }) => (
+const Button = ({ id, children, fn }: { id: string, children: JSX.Element, fn: () => unknown }) => (
     <div class="col-sm-6 smallpad">
         <button id={id} class="btn btn-primary btn-block" type="button" onclick={fn}>
             {children}

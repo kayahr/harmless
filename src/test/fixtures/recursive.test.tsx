@@ -14,7 +14,7 @@ describe("fixture", () => {
         it("renders correctly", async () => {
             let next = (value: number | null) => {};
             const observable = new Observable<number | null>(observer => { next = v => observer.next(v); observer.next(-1); });
-            const promise = new Promise(resolve => setTimeout(() => resolve(observable), 0));
+            const promise = new Promise(resolve => { setTimeout(() => resolve(observable), 0) });
             const root = render(<>{[ "Value: ", [ () => promise ] ]}</>);
             assertSame(root.innerHTML, "<!--<>-->Value: <!--<>--><!----><!--</>--><!--</>-->");
             next(1);
@@ -33,7 +33,7 @@ describe("fixture", () => {
         it("renders correctly", async () => {
             let next = (value: number | null) => {};
             const observable = new Observable<number | null>(observer => { next = v => observer.next(v); observer.next(-1); });
-            const promise = new Promise(resolve => setTimeout(() => resolve(observable), 0));
+            const promise = new Promise(resolve => { setTimeout(() => resolve(observable), 0) });
             const root = render(<input value={() => promise} />);
             assertSame(root.innerHTML, "<input>");
             next(1);

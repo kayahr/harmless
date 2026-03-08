@@ -24,7 +24,7 @@ export namespace JSX {
          *
          * @returns The created JSX element.
          */
-        render(): JSX.Element;
+        render(): Element;
 
         /**
          * Called when component is destroyed.

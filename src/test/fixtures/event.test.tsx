@@ -24,7 +24,7 @@ describe("fixture", () => {
         });
         it("can be registered via Promise", async (context) => {
             const handler = context.mock.fn();
-            const promise = new Promise(resolve => setTimeout(() => resolve(handler), 0));
+            const promise = new Promise(resolve => { setTimeout(() => resolve(handler), 0) });
             const root = render(<button id="btn" onclick={promise} />);
             assertSame(root.innerHTML, '<button id="btn"></button>');
             assertSame(handler.mock.callCount(), 0);

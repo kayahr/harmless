@@ -84,7 +84,7 @@ describe("IntrinsicElement", () => {
             assertSame(node.outerHTML, '<div class="cls"></div>');
         });
         it("can set attribute values via promise", async () => {
-            const promise = new Promise(resolve => setTimeout(() => resolve("foo"), 0));
+            const promise = new Promise(resolve => { setTimeout(() => resolve("foo"), 0) });
             const element = new IntrinsicElement("div", { id: promise, class: "cls" }, []);
             const node = element.createNode() as HTMLDivElement;
             assertSame(node.outerHTML, '<div class="cls"></div>');
@@ -228,7 +228,7 @@ describe("IntrinsicElement", () => {
             assertNull(observer);
         });
         it("resolves promise child with empty text node which is replaced later with new node", async () => {
-            const promise = new Promise<string>(resolve => setTimeout(() => resolve("foo"), 0));
+            const promise = new Promise<string>(resolve => { setTimeout(() => resolve("foo"), 0) });
             const node = new IntrinsicElement("div", {}, [ promise ]).createNode() as HTMLElement;
             assertSame(node.outerHTML, "<div><!----></div>");
             await promise;
@@ -307,7 +307,7 @@ describe("IntrinsicElement", () => {
             assertSame(node.innerHTML, "<!--<>-->123 true<!--</>-->");
         });
         it("asynchronously resolves JSX fragment child from promise", async () => {
-            const child = new Promise(resolve => setTimeout(() => resolve(new FragmentElement([ 123, " ", true ])), 0));
+            const child = new Promise(resolve => { setTimeout(() => resolve(new FragmentElement([ 123, " ", true ])), 0) });
             const node = new IntrinsicElement("div", {}, [ child ]).createNode() as HTMLElement;
             assertSame(node.innerHTML, "<!---->");
             await child;

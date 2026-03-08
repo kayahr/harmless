@@ -110,15 +110,19 @@ export function addNodeReplaceListener(node: JSXNode, listener: ReplaceListener)
 
 /** Anchor node marking the start of a range fragment. */
 export class RangeFragmentStart extends Comment {
-    public constructor(public readonly ownerFragment: RangeFragment) {
+    public readonly ownerFragment: RangeFragment;
+    public constructor(ownerFragment: RangeFragment) {
         super("<>");
+        this.ownerFragment = ownerFragment;
     }
 }
 
 /** Anchor node marking the end of a range fragment. */
 export class RangeFragmentEnd extends Comment {
-    public constructor(public readonly ownerFragment: RangeFragment) {
+    public readonly ownerFragment: RangeFragment;
+    public constructor(ownerFragment: RangeFragment) {
         super("</>");
+        this.ownerFragment = ownerFragment;
     }
 }
 

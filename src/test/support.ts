@@ -49,5 +49,5 @@ export function createFragment(name = ""): RangeFragment {
  * @param ms - The number of milliseconds to sleep. Defaults to 0 which means waiting a single macro task.
  */
 export function sleep(ms = 0): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => { setTimeout(resolve, ms) });
 }

@@ -24,11 +24,16 @@ describe("component", () => {
 
         @component({ inject: [ Service, "name" ] })
         class Component {
+            private readonly service: Service;
+            private readonly name: string;
             public constructor(
                 props: unknown,
-                private readonly service: Service,
-                private readonly name: string
-            ) {}
+                service: Service,
+                name: string
+            ) {
+                this.service = service;
+                this.name = name;
+            }
 
             public render() {
                 return <>{this.service.value} {this.name}</>;
@@ -49,11 +54,16 @@ describe("component", () => {
         }
 
         class Component {
+            private readonly service: Service;
+            private readonly name: string;
             public constructor(
                 props: unknown,
-                private readonly service: Service,
-                private readonly name: string
-            ) {}
+                service: Service,
+                name: string
+            ) {
+                this.service = service;
+                this.name = name;
+            }
 
             public render() {
                 return <>{this.service.value} {this.name}</>;
@@ -131,11 +141,16 @@ describe("component", () => {
 
         @component({ inject: [ Service, "name" ] })
         class Component {
+            public service: Service;
+            public name: string;
             public constructor(
                 props: unknown,
-                public service: Service,
-                public name: string
-            ) {}
+                service: Service,
+                name: string
+            ) {
+                this.service = service;
+                this.name = name;
+            }
 
             public render() {
                 return <>{this.service.value} {this.name}</>;
@@ -158,55 +173,118 @@ describe("component", () => {
             // @ts-expect-error Must not compile because inject array is empty
             @component({ inject: [] })
             class Test1 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because DepB is missing
             @component({ inject: [ DepA ] })
             class Test2 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because dependencies are in wrong order
             @component({ inject: [ DepB, DepA ] })
             class Test3 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because too many dependencies are specified
             @component({ inject: [ DepA, DepB, DepB ] })
             class Test4 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because inject option is missing
             @component({})
             class Test5 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because component options are required
             @component()
             class Test6 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because decorator arguments are required
             @component
             class Test7 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because null inject is not allowed
             @component({ inject: [ null, DepB ] })
             class Test8 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because properties parameter must not be specified
             @component({ inject: [ "props", DepA, DepB ] })
             class Test9 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
 
@@ -224,12 +302,26 @@ describe("component", () => {
             // @ts-expect-error Must not compile because class is not a JSX element class (render method missing)
             @component({ inject: [ DepA, DepB ] })
             class Test1 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
             }
             // @ts-expect-error Must not compile because class is not a JSX element class (render method incompatible)
             @component({ inject: [ DepA, DepB ] })
             class Test2 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): void {}
             }
 
@@ -245,56 +337,112 @@ describe("component", () => {
         // Wrapped into function which is never called because this test is a compiler only test
         const dummy = () => {
             class Test1 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because inject array is empty
             component(Test1, { inject: [] });
 
             class Test2 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because DepB is missing
             component(Test2, { inject: [ DepA ] });
 
             class Test3 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because dependencies are in wrong order
             component(Test3, { inject: [ DepB, DepA ] });
 
             class Test4 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because too many dependencies are specified
             component(Test4, { inject: [ DepA, DepB, DepB ] });
 
             class Test5 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because inject option is missing
             component(Test5, {});
 
             class Test6 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because component options are required
             component(Test6);
 
             class Test7 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because null inject is not allowed
             component(Test7, { inject: [ null, DepB ] });
 
             class Test8 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): Element { return <></>; }
             }
             // @ts-expect-error Must not compile because properties parameter must not be specified
@@ -312,13 +460,27 @@ describe("component", () => {
         // Wrapped into function which is never called because this test is a compiler only test
         const dummy = () => {
             class Test1 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
             }
             // @ts-expect-error Must not compile because class is not a JSX element class (render method missing)
             component(Test1, { inject: [ DepA, DepB ] });
 
             class Test2 {
-                public constructor(public props: unknown, public a: DepA, public b: DepB) {}
+                public props: unknown;
+                public a: DepA;
+                public b: DepB;
+                public constructor(props: unknown, a: DepA, b: DepB) {
+                    this.props = props;
+                    this.a = a;
+                    this.b = b;
+                }
                 public render(): void {}
             }
             // @ts-expect-error Must not compile because class is not a JSX element class (render method incompatible)

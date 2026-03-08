@@ -49,7 +49,12 @@ describe("ClassComponent", () => {
             const context = Context.getActive();
             context.setValue("Jane", "name");
             class Component {
-                public constructor(public props: { a: number }, public name: string) {}
+                public props: { a: number };
+                public name: string;
+                public constructor(props: { a: number }, name: string) {
+                    this.props = props;
+                    this.name = name;
+                }
                 public render() {
                     return <div>{this.name} {this.props.a}</div>;
                 }
@@ -64,7 +69,12 @@ describe("ClassComponent", () => {
             const value = Promise.resolve("Jane");
             context.setValue(value, "name");
             class Component {
-                public constructor(public props: { a: number }, public name: string) {}
+                public props: { a: number };
+                public name: string;
+                public constructor(props: { a: number }, name: string) {
+                    this.props = props;
+                    this.name = name;
+                }
                 public render() {
                     return <div>{this.name} {this.props.a}</div>;
                 }
@@ -134,7 +144,12 @@ describe("ClassComponent", () => {
         const destroy = context.mock.fn();
         Context.getActive().setValue("Jane", "test");
         class Test implements ComponentClass {
-            public constructor(public props: { a: number }, public name: string) {}
+            public props: { a: number };
+            public name: string;
+            public constructor(props: { a: number }, name: string) {
+                this.props = props;
+                this.name = name;
+            }
 
             public render(): Element {
                 onDestroy(destroy);
@@ -152,7 +167,12 @@ describe("ClassComponent", () => {
         const destroy = context.mock.fn();
         Context.getActive().setValue(Promise.resolve("Jane"), "test");
         class Test implements ComponentClass {
-            public constructor(public props: { a: number }, public name: string) {}
+            public props: { a: number };
+            public name: string;
+            public constructor(props: { a: number }, name: string) {
+                this.props = props;
+                this.name = name;
+            }
 
             public render(): Element {
                 onDestroy(destroy);
@@ -173,7 +193,10 @@ describe("ClassComponent", () => {
         }
         Context.getActive().setClass(Dep);
         class Component {
-            public constructor(props: {}, public dep: Dep) {}
+            public dep: Dep;
+            public constructor(props: {}, dep: Dep) {
+                this.dep = dep;
+            }
 
             public render() {
                 return <>{() => this.dep.value.get()}</>;

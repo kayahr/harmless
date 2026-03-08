@@ -229,7 +229,10 @@ describe("Routes", () => {
         }
         component(ParamsA, { inject: [ RouteParams ] });
         class ParamsB {
-            public constructor(props: {}, public params: RouteParams<{ b: string }>) {}
+            public params: RouteParams<{ b: string }>;
+            public constructor(props: {}, params: RouteParams<{ b: string }>) {
+                this.params = params;
+            }
 
             public render() {
                 initParamsB();

@@ -59,7 +59,7 @@ export abstract class JSXElement<T extends Element = Element> {
         let node: Node = new PlaceholderNode();
         const subscription = source.subscribe(source => {
             const newNode = context.runInContext(() => this.resolveNode(source));
-            addNodeReplaceListener(newNode, newNode => node = newNode);
+            addNodeReplaceListener(newNode, newNode => { node = newNode });
             replaceNode(node, newNode);
             node = newNode;
         }, error => console.error(error));

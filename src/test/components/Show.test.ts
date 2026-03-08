@@ -54,16 +54,8 @@ describe("Show", () => {
             for (const [ fallbackName, fallback ] of Object.entries(fallbacks)) {
                 it(`with ${childName} child and ${fallbackName} fallback`, async () => {
                     const wait = async () => {
-                        if (child instanceof Array) {
-                            await Promise.all(child);
-                        } else {
-                            await child;
-                        }
-                        if (fallback instanceof Array) {
-                            await Promise.all(fallback);
-                        } else {
-                            await fallback;
-                        }
+                        await (child instanceof Array ? Promise.all(child) : child);
+                        await (fallback instanceof Array ? Promise.all(fallback) : fallback);
                     };
                     const when = signal(true);
                     const element = Show({
@@ -102,16 +94,8 @@ describe("Show", () => {
             for (const [ fallbackName, fallback ] of Object.entries(fallbacks)) {
                 it(`with ${childName} child and ${fallbackName} fallback`, async () => {
                     const wait = async () => {
-                        if (child instanceof Array) {
-                            await Promise.all(child);
-                        } else {
-                            await child;
-                        }
-                        if (fallback instanceof Array) {
-                            await Promise.all(fallback);
-                        } else {
-                            await fallback;
-                        }
+                        await (child instanceof Array ? Promise.all(child) : child);
+                        await (fallback instanceof Array ? Promise.all(fallback) : fallback);
                     };
                     const when = signal(true);
                     const element = Show({

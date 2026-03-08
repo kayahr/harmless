@@ -53,12 +53,12 @@ describe("fixture", () => {
             let compBActive = false;
             const CompA = () => {
                 compAActive = true;
-                onDestroy(() => compAActive = false);
+                onDestroy(() => { compAActive = false });
                 return <span>CompA</span>;
             };
             const CompB = () => {
                 compBActive = true;
-                onDestroy(() => compBActive = false);
+                onDestroy(() => { compBActive = false });
                 return <span>CompB</span>;
             };
             const root = render(<Show when={visible} fallback={<CompB />}><CompA /></Show>);
@@ -77,12 +77,12 @@ describe("fixture", () => {
             let compBActive = false;
             const CompA = () => {
                 compAActive = true;
-                onDestroy(() => compAActive = false);
+                onDestroy(() => { compAActive = false });
                 return <>CompA</>;
             };
             const CompB = () => {
                 compBActive = true;
-                onDestroy(() => compBActive = false);
+                onDestroy(() => { compBActive = false });
                 return <>CompB</>;
             };
             const root = render(<Show when={visible} fallback={<CompB />}><CompA /></Show>);
@@ -101,12 +101,12 @@ describe("fixture", () => {
             let compBActive = false;
             const CompA = () => {
                 compAActive = true;
-                onDestroy(() => compAActive = false);
+                onDestroy(() => { compAActive = false });
                 return <span>CompA</span>;
             };
             const CompB = () => {
                 compBActive = true;
-                onDestroy(() => compBActive = false);
+                onDestroy(() => { compBActive = false });
                 return <span>CompB</span>;
             };
             const root = render(<Show when={visible} fallback={<><CompB /></>}><><CompA /></></Show>);

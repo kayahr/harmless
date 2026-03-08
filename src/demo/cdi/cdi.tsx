@@ -12,7 +12,7 @@ import { component } from "../../main/utils/component.ts";
 import { render } from "../../main/utils/render.ts";
 
 export async function sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => { setTimeout(resolve, ms) });
 }
 
 // This example shows how to use dependency injection to connect services to components.
@@ -38,10 +38,12 @@ class AsyncMathService {
 
 @component({ inject: [ MathService ] })
 export class Counter implements JSX.ElementClass {
-    public constructor(
-        private readonly props: { inc: number },
-        private readonly mathService: MathService
-    ) {}
+    private readonly props: { inc: number };
+    private readonly mathService: MathService;
+    public constructor(props: { inc: number }, mathService: MathService) {
+        this.props = props;
+        this.mathService = mathService;
+    }
 
     public render(): JSX.Element {
         const count = signal(0);
