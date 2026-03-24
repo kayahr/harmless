@@ -1,11 +1,10 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib",
+    "js/ts.tsdk.path": "node_modules/typescript/lib",
     "files.exclude": {
         "lib": true,
         "node_modules": true
     },
-    "task.allowAutomaticTasks": "on",
-    "typescript.preferences.autoImportFileExcludePatterns": [
+    "js/ts.preferences.autoImportFileExcludePatterns": [
         "@kayahr/harmless",
         "@kayahr/harmless/jsx-runtime",
         "./src/main/index.ts",

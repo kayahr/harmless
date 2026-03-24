@@ -107,7 +107,7 @@ For special use-cases the type can be narrowed down. Let's say you write a compo
 </Numbers>
 ```
 
-Note that JSX treats multiple children differently than a single child or no child at all. So you won't get an empty array, an array with one number or an array with multiple numbers. Instead you will get `undefined` when no child is specified, `number` when a single number is specified, and `number[]` when multiple numbers are given. Therefor an implementation accepting any number of values (even none) must be written like this:
+Note that JSX treats multiple children differently than a single child or no child at all. So you won't get an empty array, an array with one number or an array with multiple numbers. Instead you will get `undefined` when no child is specified, `number` when a single number is specified, and `number[]` when multiple numbers are given. Therefore an implementation accepting any number of values (even none) must be written like this:
 
 ```typescript
 function Numbers({ children }: { children?: number | number[] }) {

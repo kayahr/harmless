@@ -14,7 +14,7 @@ describe("fixture", () => {
             const root = render(
                 <div>
                   <span id="string">Test</span>
-                  <span id="numbers">{123} {-23} {13.45} {-42.01} {Infinity} {-Infinity} {NaN} {-0} {+0}</span>
+                  <span id="numbers">{123} {-23} {13.45} {-42.01} {Infinity} {-Infinity} {NaN} {-0} {0}</span>
                   <span id="booleans">{true} {false}</span>
                   <span id="null">{null}</span>
                   <span id="undefined">{undefined}</span>

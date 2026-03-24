@@ -23,7 +23,7 @@ export function dump(node: Node): string {
             return `</${node.ownerFragment.toString()}>`;
         }
         if (node instanceof Text) {
-            return String(node.textContent);
+            return node.textContent;
         }
         const tagName = node.nodeName.toLowerCase();
         return `<${tagName}>${Array.from(node.childNodes).map(node => dump(node)).join("")}</${tagName}>`;
