@@ -54,8 +54,8 @@ describe("Show", () => {
             for (const [ fallbackName, fallback ] of Object.entries(fallbacks)) {
                 it(`with ${childName} child and ${fallbackName} fallback`, async () => {
                     const wait = async () => {
-                        await (child instanceof Array ? Promise.all(child) : child);
-                        await (fallback instanceof Array ? Promise.all(fallback) : fallback);
+                        await (child instanceof Array ? Promise.all(child.filter(child => child instanceof Promise)) : child);
+                        await (fallback instanceof Array ? Promise.all(fallback.filter(fallback => fallback instanceof Promise)) : fallback);
                     };
                     const when = signal(true);
                     const element = Show({
