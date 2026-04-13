@@ -119,6 +119,11 @@ export class IntrinsicElement extends JSXElement<Node> {
             element.toggleAttribute(attributeName, attributeValue);
         } else if (attributeName === "style" && attributeValue.constructor === Object) {
             element.setAttribute(attributeName, Object.entries(attributeValue).map(([ key, value ]) => `${key}: ${value}`).join("; "));
+        } else if (attributeName === "class" && attributeValue.constructor === Array) {
+            element.setAttribute(attributeName, (attributeValue as []).join(" "));
+        } else if (attributeName === "class" && attributeValue.constructor === Object) {
+            element.setAttribute(attributeName, Object.entries(attributeValue).map(([ className, enabled ]) => enabled ? className : null)
+                .filter(Boolean).join(" "));
         } else {
             element.setAttribute(attributeName, String(attributeValue));
         }
