@@ -43,7 +43,7 @@
         "prepare": "run clean build"
     },
     "devDependencies": {
-        "@happy-dom/global-registrator": "20.8.9",
+        "@happy-dom/global-registrator": "20.9.0",
         "@kayahr/assert": "1.4.1",
         "@kayahr/cspell": "9.7.0-bundle.1",
         "@kayahr/npm-utils": "1.1.2",
