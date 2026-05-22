@@ -1,0 +1,2 @@
+reject:
+  - "@kayahr/signal"    # Temporarily not compatible to signal v5
