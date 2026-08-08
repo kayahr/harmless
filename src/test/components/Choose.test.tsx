@@ -22,9 +22,9 @@ describe("Choose", () => {
     });
     it("renders first <When> node that matches test expression", () => {
         const choose = <Choose>
-            <When test={() => Math.random() > 1}>A</When>
-            <When test={() => 2 > 1}>B</When>
-            <When test={() => 3 > 1}>C</When>
+            <When test={() => false}>A</When>
+            <When test={() => true}>B</When>
+            <When test={() => true}>C</When>
             <Otherwise>X</Otherwise>
         </Choose>;
         const root = document.createElement("body");
@@ -33,8 +33,8 @@ describe("Choose", () => {
     });
     it("renders first <Otherwise> node when no <When> node matches test expression", () => {
         const choose = <Choose>
-            <When test={() => 2 < 1}>B</When>
-            <When test={() => 3 < 1}>C</When>
+            <When test={() => false}>B</When>
+            <When test={() => false}>C</When>
             <Otherwise>X</Otherwise>
             <Otherwise>Y</Otherwise>
         </Choose>;

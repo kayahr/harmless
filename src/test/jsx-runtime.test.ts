@@ -23,7 +23,7 @@ describe("jsx-runtime", () => {
         });
 
         // Interfaces and types can only be checked by TypeScript
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        ((): Element => (({} as exports.JSX.Element)))();
+        const a: exports.JSX.Element = {};
+        ((): Element => a)();
     });
 });

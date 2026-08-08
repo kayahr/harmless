@@ -50,12 +50,14 @@ describe("index", () => {
         ((): WhenProperties => (({} as exports.WhenProperties)))();
         ((): AProperties => (({} as exports.AProperties)))();
         ((): ComponentClass => (({} as exports.ComponentClass)))();
-        ((): ElementObject => (({} as exports.ElementObject)))();
+        ((): ElementObject => ((0 as unknown as exports.ElementObject)))();
         ((): IfProperties => (({} as exports.IfProperties)))();
         ((): RouteParams => (({} as exports.RouteParams)))();
         ((): RouteProperties => (({} as exports.RouteProperties)))();
 
-        void ((): Element => (({} as exports.Element)))();
-        void ((): Element => (({} as exports.JSX.Element)))();
+        const a: exports.Element = {};
+        void ((): Element => a)();
+        const b: exports.JSX.Element = {};
+        void ((): Element => b)();
     });
 });
