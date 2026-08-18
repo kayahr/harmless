@@ -9,7 +9,7 @@ A minimalistic reactive web frontend framework written in TypeScript.
 * Fine-grained reactive DOM updates via [promises], [observables] and signals using a framework-independent [signal] implementation.
 * Based on standard [JSX] using the automatic runtime (aka `react-jsx` mode), so no special transpiler plugin needed.
 * Supports dependency injection via a framework-independent [DI] implementation.
-* Renders native HTML, SVG and MathML elements with reactive properties, attributes and styles.
+* Supports native HTML, SVG and MathML elements with reactive properties, attributes and styles.
 * Provides built-in components for flow control, like [If], [Choose] and [Route].
 * Provides keyed list rendering with [For].
 * It's just a library without any build system requirements. Use whatever you like.
@@ -58,10 +58,10 @@ function Counter() {
 document.body.append(render(<Counter />));
 ```
 
-See the [documentation] for setup, components, signals, rendering, lifecycle management, built-in components and SVG support.
+See the [documentation] for more details.
 
 [API Doc]: https://kayahr.github.io/harmless/
-[Documentation]: ./doc/index.md
+[Documentation]: https://kayahr.github.io/harmless/documents/Documentation.html
 [GitHub]: https://github.com/kayahr/harmless
 [NPM]: https://www.npmjs.com/package/@kayahr/harmless
 [Vitest]: https://vitest.dev/
