@@ -31,7 +31,7 @@ Harmless calls `name`, tracks the signal and replaces the text in the `p` elemen
 
 Do not call the getter in the JSX child position as `{name()}`, as you might in SolidJS. This resolves the signal while `Greeting` is being called and passes only its current value to Harmless. The connection to the signal is then lost, so later changes cannot update the text. Pass the getter directly as `{name}`, or wrap more complex expressions in a function such as `{() => "Hello " + name()}`.
 
-Use an inline function for derived content or conditional subtrees:
+Use a [computed signal](../signals.md#computed-signals) for derived content or conditional subtrees. A computed signal is an ordinary function, so it can be declared separately or written inline:
 
 ```tsx
 const [ count, setCount ] = createSignal(0);

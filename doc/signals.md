@@ -6,6 +6,8 @@ title: Signals
 
 Signals are a basic concept for reactive user interfaces and are used by many modern web frameworks. While other frameworks come with a deeply integrated signal system which only works within that specific framework, Harmless uses the standalone [@kayahr/signal](https://www.npmjs.com/package/@kayahr/signal) implementation. These signals are not tied to Harmless and can also be used in any other TypeScript or JavaScript code.
 
+See the complete [signal documentation](https://kayahr.github.io/signal/) for equality configuration, batching, array signals, resources, effects, promise and observable integration and explicit scopes.
+
 ## Writable Signals
 
 The component in this example shows a counter which increases every time the button is pressed:
@@ -36,13 +38,33 @@ const [ name, setName ] = createSignal("Arthur");
 return <input value={name} aria-label={() => `Edit ${name()}`} />;
 ```
 
-Here `value` always reflects the signal. The inline function for `aria-label` reads the same signal and derives a different value from it.
+Here `value` always reflects the signal. The inline function for `aria-label` is a computed signal which reads the same signal and derives a different value from it.
+
+## Computed Signals
+
+A computed signal is an ordinary function which reads other signals to calculate a value. It needs no special API:
+
+```tsx
+const [ firstName, setFirstName ] = createSignal("Arthur");
+const [ lastName, setLastName ] = createSignal("Dent");
+const fullName = () => `${firstName()} ${lastName()}`;
+```
+
+Calling `fullName()` calculates the current value. The result is not cached, so every call runs the function again.
+
+Functions used as JSX children or intrinsic element properties are computed signals. Harmless calls the function, tracks the signals read during that call and calls the function again when one of those signals changes:
+
+```tsx
+return <p title={fullName}>Hello {fullName}</p>;
+```
+
+This works in exactly the same way with inline functions such as ``{() => `Hello ${firstName()}`}``.
 
 ## Memos
 
-Another important signal type is the memo, created with `createMemo`. A memo is a read-only signal which uses a function to calculate its value. The remarkable part is that this function can read other signals and automatically tracks them as dependencies.
+A memo is a cached computed signal created with `createMemo`. It is useful when calculating the value is expensive or when the same derived value is read in several places.
 
-More precisely, a memo is invalidated when one of its dependencies changes. The next read recalculates and caches the value until another dependency changes. Dependencies are dynamic and correspond to the signals read during the most recent calculation.
+The calculation runs when the memo is read for the first time. Further reads return the cached result without calling the calculation function again. When one of its dependencies changes, the memo becomes stale. The next read recalculates and caches the new value. Dependencies are dynamic and correspond to the signals read during the most recent calculation.
 
 The following example uses a memo to transform the value of a writable signal to uppercase:
 
@@ -60,22 +82,20 @@ export function Name() {
 }
 ```
 
-Functions used as JSX children or intrinsic properties are already tracked by Harmless, so a separate memo is not necessary for every derived value. The following style property updates whenever `textColor` changes:
+A normal computed signal is sufficient for inexpensive values used in one place. The following style property updates whenever `textColor` changes:
 
 ```tsx
 export function HelloWorld() {
     const [ textColor, setTextColor ] = createSignal("red");
+    const style = () => ({ color: textColor() });
 
-    return <button
-        style={() => ({ color: textColor() })}
-        on:click={() => setTextColor("blue")}
-    >
+    return <button style={style} on:click={() => setTextColor("blue")}>
         Hello World
     </button>;
 }
 ```
 
-Alternatively you can create the memo yourself when the value is expensive to calculate, is used more than once or is also needed outside JSX:
+You can create a memo yourself when caching the result is useful:
 
 ```tsx
 export function HelloWorld() {
@@ -116,9 +136,10 @@ An effect can register cleanup functions which run before the next execution and
 
 ## Asynchronous Resources
 
-`createResource` represents asynchronous work as reactive state. The following component reloads a user whenever its `id` signal changes and renders the current resource state:
+`createResource` represents asynchronous work as reactive state. The following component reloads a user whenever its `id` signal changes and uses [Choose](./components/built-in-components/choose.md) to render the current resource state:
 
 ```tsx
+import { Choose, When } from "@kayahr/harmless";
 import { ResourceStatus, createResource } from "@kayahr/signal";
 
 interface User {
@@ -131,18 +152,17 @@ function UserName({ id }: { id: () => number }) {
         return await response.json() as User;
     });
 
-    return () => {
-        switch (resource.status()) {
-            case ResourceStatus.Loading:
-                return <span>Loading...</span>;
-            case ResourceStatus.Failed:
-                return <span role="alert">{resource.error()?.message}</span>;
-            case ResourceStatus.Ready:
-                return <span>{user()?.name}</span>;
-            default:
-                return null;
-        }
-    };
+    return <Choose>
+        <When test={() => resource.status() === ResourceStatus.Loading}>
+            <span>Loading...</span>
+        </When>
+        <When test={() => resource.status() === ResourceStatus.Failed}>
+            <span role="alert">{() => resource.error()?.message}</span>
+        </When>
+        <When test={() => resource.status() === ResourceStatus.Ready}>
+            <span>{() => user()?.name}</span>
+        </When>
+    </Choose>;
 }
 ```
 
@@ -153,5 +173,3 @@ The resource exposes its status, error and value through signals. Updating them 
 Harmless creates an ownership scope for every component and every replaceable reactive subtree. Memos, effects and resources register with the active scope when they are created synchronously and are disposed together with it.
 
 Signals created outside a component are owned by the application. Dispose associated effects, memos or resources through their handles or through an explicit `@kayahr/scope` scope when the application no longer needs them.
-
-See the complete [`@kayahr/signal` documentation](https://kayahr.github.io/signal/) for equality configuration, batching, array signals, resources, effects, promise and observable integration and explicit scopes.
