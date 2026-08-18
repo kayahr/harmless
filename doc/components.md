@@ -2,33 +2,30 @@
 title: Components
 children:
     - ./components/class-components.md
-    - ./components/rendering.md
-    - ./components/reactive-content.md
     - ./components/component-lifecycles.md
-    - ./components/event-handlers.md
     - ./components/dependency-injection.md
+    - ./components/built-in-components.md
 ---
 
 # Components
 
-Components are written in form of simple functions or in form of [class components]. Both are equal in functionality so use whatever coding style you prefer. The examples in this documentation concentrates on functions but the shown concepts always also work with classes.
+Components are written as simple functions or as [class components]. Both are equal in functionality, so use whatever coding style you prefer. The examples in this documentation concentrate on functions, but the shown concepts also work with classes.
 
-Component names should always be upper-camelcase like `Contact` and `ToggleButton` because lower-case element names are reserved for normal HTML elements like `div`, `span` and all the others (also called intrinsic elements in the JSX world).
+Component names should always start with an uppercase letter, like `Contact` and `ToggleButton`, because lowercase element names are reserved for normal HTML, SVG and MathML elements like `div`, `svg` and `math`. These are also called intrinsic elements in the JSX world.
 
 ## Basics
 
-The most basic form of a component is a function without parameters which just returns
-static HTML:
+The most basic form of a component is a function without parameters which just returns static content:
 
-```typescript
+```tsx
 export function HelloWorld() {
-    return <h1>Hello World<h1>;
+    return <h1>Hello World</h1>;
 }
 ```
 
-Other components can now import this component and use it in their own template:
+Other components can now import this component and use it in their own templates:
 
-```typescript
+```tsx
 import { HelloWorld } from "./HelloWorld.js";
 
 export function App() {
@@ -36,24 +33,26 @@ export function App() {
 }
 ```
 
+A component function is called exactly once for each component instance. Signals used in the returned JSX update their specific DOM content without calling the whole component function again.
+
 ## Properties
 
-Properties are passed in as the first function argument (or first constructor argument when using classes) in form of a plain key/value object. When the component doesn't expect such an argument then the component does not allow any properties.
+Properties are passed as a plain object in the first function argument, or the first constructor argument when using classes. When a component does not declare such an argument, it does not accept any properties.
 
-The following example shows the component `Contact.tsx`. It has two properties: `firstName` and `lastName`.
+The following example shows a `Contact` component with the two properties `firstName` and `lastName`:
 
-```typescript
-export function Contact(props: { firstName: string, lastName: string }) {
+```tsx
+export function Contact(props: { firstName: string; lastName: string }) {
     return <div class="contact">
-       <div>First name: {props.firstName}</span>
-       <div>last name: {props.lastName}</span>
+        <div>First name: {props.firstName}</div>
+        <div>Last name: {props.lastName}</div>
     </div>;
 }
 ```
 
 It can be used in other components like this:
 
-```typescript
+```tsx
 import { Contact } from "./Contact.js";
 
 export function Contacts() {
@@ -64,9 +63,9 @@ export function Contacts() {
 }
 ```
 
-There are no limitations on component properties. Just treat them as you would treat a standard `object` type in TypeScript. Properties can be of any type and may also be optional. You can also use destructuring with default values and provide a properties interface to make the usage more pleasant:
+There are no special limitations on component properties. Treat them like a standard object type in TypeScript. Properties can be of any type and may also be optional. You can use destructuring with default values and provide a properties interface to make the component more pleasant to use:
 
-```typescript
+```tsx
 interface UserProperties {
     name: string;
     id: number;
@@ -79,61 +78,73 @@ function User({ name, id, admin = false }: UserProperties) {
 
 function Users() {
     return <ul>
-        <User name="root" id={0} admin={true} />
+        <User name="root" id={0} admin />
         <User name="arthur" id={1000} />
-    </ul>
+    </ul>;
 }
 ```
 
+Harmless passes component properties unchanged. Functions, promises and observables therefore remain normal values when passed to a component. They receive special reactive handling only when used as intrinsic element properties or JSX children.
+
+The exported `NoProps` type can be used when an explicit empty properties type is needed, for example when a component has no properties but receives injected dependencies.
+
 ## Children
 
-Component children are passed as `children` property to a component. If the component does not specify such a property then children are not allowed. So to use children you have to explicitly specify them like this:
+Component children are passed in the `children` property. If the component does not declare this property, then children are not allowed. To accept arbitrary child content, use `JSX.Element`:
 
-```typescript
+```tsx
+import type { JSX } from "@kayahr/harmless";
+
 function Bold(props: { children: JSX.Element }) {
     return <b>{props.children}</b>;
 }
 ```
 
-In most cases you want to use `JSX.Element` as children type to pass through any supported type and any number of children.
+In most cases `children` should be optional because JSX may invoke the component without any child content. The exported `ParentProps` interface provides this common declaration and can be extended with additional properties:
 
-For special use-cases the type can be narrowed down. Let's say you write a component which expects a list of numbers as children:
+```tsx
+import type { ParentProps } from "@kayahr/harmless";
 
-```html
-<Numbers>
-   {1}
-   {2}
-   {3}
-</Numbers>
-```
+interface PanelProperties extends ParentProps {
+    title: string;
+}
 
-Note that JSX treats multiple children differently than a single child or no child at all. So you won't get an empty array, an array with one number or an array with multiple numbers. Instead you will get `undefined` when no child is specified, `number` when a single number is specified, and `number[]` when multiple numbers are given. Therefore an implementation accepting any number of values (even none) must be written like this:
-
-```typescript
-function Numbers({ children }: { children?: number | number[] }) {
-    ...
+function Panel({ title, children }: PanelProperties) {
+    return <section class="panel">
+        <h2>{title}</h2>
+        {children}
+    </section>;
 }
 ```
 
-## More
+For special use cases the type can be narrowed. The following component, for example, expects a list of numbers as children:
 
-* [Class Components]
-* [Rendering]
-* [Reactive Content]
-* [Component Lifecycles]
-* [Event Handlers]
-* [Dependency Injection]
+```tsx
+<Numbers>
+    {1}
+    {2}
+    {3}
+</Numbers>
+```
 
-## Seel also
+JSX treats multiple children differently from a single child or no child at all. The component receives `undefined` when no child is specified, a single `number` when exactly one is specified and a `number[]` when multiple numbers are given. An implementation accepting any number of values, including none, therefore declares them like this:
 
+```tsx
+function Numbers({ children }: { children?: number | number[] }) {
+    // ...
+}
+```
+
+The component controls where and whether its children are rendered.
+
+## See Also
+
+* [Class Components](./components/class-components.md)
+* [Component Lifecycles](./components/component-lifecycles.md)
+* [Dependency Injection](./components/dependency-injection.md)
+* [Built-in Components](./components/built-in-components.md)
 * [TypeScript's JSX documentation](https://www.typescriptlang.org/docs/handbook/jsx.html)
+* [Rendering](./rendering.md)
+* [Signals](./signals.md)
 
-[signals]: https://www.npmjs.com/package/@kayahr/signal
-[promises]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
-[observables]: https://github.com/tc39/proposal-observable
-[Class Components]: ./components/class-components.md
-[Rendering]: ./components/rendering.md
-[Reactive Content]: ./components/reactive-content.md
-[Component Lifecycles]: ./components/component-lifecycles.md
-[Event Handlers]: ./components/event-handlers.md
-[Dependency Injection]: ./components/dependency-injection.md
+[class components]: ./components/class-components.md

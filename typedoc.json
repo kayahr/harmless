@@ -1,24 +1,24 @@
 {
     "$schema": "https://typedoc.org/schema.json",
-    "name": "Harmless",
     "entryPoints": [
         "src/main/index.ts"
     ],
     "basePath": "src/main",
     "entryPointStrategy": "resolve",
     "out": "lib/apidoc",
-    "projectDocuments": [
-        "doc/getting-started.md",
-        "doc/components.md",
-        "doc/control-flow.md",
-        "doc/signals.md",
-        "doc/css.md",
-        "doc/refs.md"
-    ],
-    "alwaysCreateEntryPointModule": true,
+    "projectDocuments": [ "doc/index.md" ],
+    "alwaysCreateEntryPointModule": false,
     "excludePrivate": true,
     "excludeExternals": true,
     "excludeInternal": true,
+    "intentionallyNotExported": [
+        "IntrinsicEventProps",
+        "IntrinsicReactive",
+        "IntrinsicTextAttributeValue",
+        "IntrinsicStyleValue",
+        "KnownIntrinsicElements",
+        "CustomIntrinsicElements"
+    ],
     "treatWarningsAsErrors": true,
     "validation": true,
     "plugin": [

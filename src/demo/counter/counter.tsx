@@ -3,18 +3,17 @@
  * See LICENSE.md for licensing information
  */
 
-import { signal } from "@kayahr/signal";
-
-import { render } from "../../main/utils/render.ts";
+import { createSignal } from "@kayahr/signal";
+import { render } from "@kayahr/harmless";
 
 // In this example a signal is used to count the number of button clicks and reactively update the displayed count.
 
-const count = signal(0);
-const increment = () => { count.update(value => value + 1); };
+const [ count, setCount ] = createSignal(0);
+const increment = () => { setCount(value => value + 1); };
 
 document.body.appendChild(render(<>
   <div>
     Count: {count}
   </div>
-  <button onclick={increment}>Increment</button>
+  <button on:click={increment}>Increment</button>
 </>));

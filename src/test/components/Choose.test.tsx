@@ -1,198 +1,217 @@
 /*
- * Copyright (C) 2025 Klaus Reimer <k@ailis.de>
- * See LICENSE.md for licensing information
+ * Copyright (C) 2026 Klaus Reimer
+ * SPDX-License-Identifier: MIT
  */
 
-import { Context } from "@kayahr/cdi";
-import { signal } from "@kayahr/signal";
+import "../dom.ts";
+import { dispose } from "@kayahr/scope";
+import { createSignal } from "@kayahr/signal";
 import { describe, it } from "node:test";
-import { assertGreaterThan, assertSame } from "@kayahr/assert";
+import { assertInstanceOf, assertSame } from "@kayahr/assert";
 import { Choose, Otherwise, When } from "../../main/components/Choose.ts";
-import { component } from "../../main/utils/component.ts";
-import { onDestroy } from "../../main/utils/lifecycle.ts";
-import { render } from "../../main/utils/render.ts";
-import { sleep } from "../support.ts";
+import type { ComponentContext, NoProps } from "../../main/jsx.ts";
+import { render } from "../../main/render.ts";
 
 describe("Choose", () => {
-    it("renders empty node if empty", () => {
-        const choose = <Choose></Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        assertSame(root.innerHTML, "<!--<>--><!--</>-->");
-    });
-    it("renders first <When> node that matches test expression", () => {
-        const choose = <Choose>
-            <When test={() => false}>A</When>
-            <When test={() => true}>B</When>
-            <When test={() => true}>C</When>
-            <Otherwise>X</Otherwise>
-        </Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
-    });
-    it("renders first <Otherwise> node when no <When> node matches test expression", () => {
-        const choose = <Choose>
-            <When test={() => false}>B</When>
-            <When test={() => false}>C</When>
-            <Otherwise>X</Otherwise>
-            <Otherwise>Y</Otherwise>
-        </Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
-    });
-    it("renders <Otherwise> node when only child", () => {
-        const choose = <Choose>
-            <Otherwise>X</Otherwise>
-        </Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
-    });
-    it("dynamically switches content", () => {
-        const value = signal(0);
-        const choose = <Choose>
-            <When test={() => value.get() < 1}>A</When>
-            <When test={() => value.get() < 2}>B</When>
-            <When test={() => value.get() < 3}>C</When>
-            <Otherwise>X</Otherwise>
-        </Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
-        value.set(1);
-        assertSame(root.innerHTML, "<!--<>-->B<!--</>-->");
-        value.set(2);
-        assertSame(root.innerHTML, "<!--<>-->C<!--</>-->");
-        value.set(3);
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
-    });
-    it("initializes shown components and destroys hidden components", (context) => {
-        const value = signal(0);
-        const initA = context.mock.fn();
-        const destroyA = context.mock.fn();
-        const initX = context.mock.fn();
-        const destroyX = context.mock.fn();
-        function A() {
-            initA();
-            onDestroy(destroyA);
-            return "A";
-        }
-        function X() {
-            initX();
-            onDestroy(destroyX);
-            return "X";
-        }
-        const choose = <Choose>
-            <When test={() => value.get() < 1}><A /></When>
-            <Otherwise><X /></Otherwise>
-        </Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        assertSame(initA.mock.callCount(), 1);
-        assertSame(initX.mock.callCount(), 0);
-        assertSame(destroyA.mock.callCount(), 0);
-        assertSame(destroyX.mock.callCount(), 0);
-        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
-        initA.mock.resetCalls();
+    it("renders the first static When branch whose test is true", () => {
+        const node = render(
+            <Choose>
+                ignored text
+                <span>ignored element</span>
+                <When test={false}><span>A</span></When>
+                <When test={true}><span>B</span></When>
+                <When test={true}><span>C</span></When>
+                <Otherwise><span>X</span></Otherwise>
+            </Choose>
+        );
 
-        value.set(1);
-        assertSame(initA.mock.callCount(), 0);
-        assertSame(initX.mock.callCount(), 1);
-        assertSame(destroyA.mock.callCount(), 1);
-        assertSame(destroyX.mock.callCount(), 0);
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
-        initX.mock.resetCalls();
-        destroyA.mock.resetCalls();
-
-        value.set(0);
-        assertGreaterThan(initA.mock.callCount(), 0);
-        assertSame(initX.mock.callCount(), 0);
-        assertSame(destroyA.mock.callCount(), 0);
-        assertSame(destroyX.mock.callCount(), 1);
-        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
-        initA.mock.resetCalls();
-        destroyX.mock.resetCalls();
-
-        value.set(1);
-        assertSame(initA.mock.callCount(), 0);
-        assertSame(initX.mock.callCount(), 1);
-        assertSame(destroyA.mock.callCount(), 1);
-        assertSame(destroyX.mock.callCount(), 0);
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
+        assertInstanceOf(node, HTMLSpanElement);
+        assertSame(node.textContent, "B");
     });
 
-    it("initializes shown async components and destroys hidden async components", async (context) => {
-        const value = signal(0);
-        const initA = context.mock.fn();
-        const destroyA = context.mock.fn();
-        const initX = context.mock.fn();
-        const destroyX = context.mock.fn();
-        class DepA {
-            public static create(): Promise<DepA> {
-                return Promise.resolve(new DepA());
-            }
-        }
-        Context.getActive().setFactory(DepA, DepA.create);
-        class DepX {
-            public static create(): Promise<DepX> {
-                return Promise.resolve(new DepX());
-            }
-        }
-        Context.getActive().setFactory(DepX, DepX.create);
-        function A(props: {}, depA: DepA) {
-            initA();
-            onDestroy(destroyA);
-            return "A";
-        }
-        component(A, { inject: [ DepA ] });
-        function X(props: {}, depX: DepX) {
-            initX();
-            onDestroy(destroyX);
-            return "X";
-        }
-        component(X, { inject: [ DepX ] });
-        const choose = <Choose>
-            <When test={() => value.get() < 1}><A /></When>
-            <Otherwise><X /></Otherwise>
-        </Choose>;
-        const root = document.createElement("body");
-        root.appendChild(render(choose));
-        await sleep(0);
-        assertSame(initA.mock.callCount(), 1);
-        assertSame(initX.mock.callCount(), 0);
-        assertSame(destroyA.mock.callCount(), 0);
-        assertSame(destroyX.mock.callCount(), 0);
-        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
-        initA.mock.resetCalls();
+    it("renders an empty matching When branch instead of Otherwise", () => {
+        const node = render(
+            <Choose>
+                <When test={true} />
+                <Otherwise>X</Otherwise>
+            </Choose>
+        );
 
-        value.set(1);
-        await sleep(0);
-        assertSame(initA.mock.callCount(), 0);
-        assertSame(initX.mock.callCount(), 1);
-        assertSame(destroyA.mock.callCount(), 1);
-        assertSame(destroyX.mock.callCount(), 0);
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
-        initX.mock.resetCalls();
-        destroyA.mock.resetCalls();
+        assertInstanceOf(node, DocumentFragment);
+        assertSame(node.textContent, "");
+    });
 
-        value.set(0);
-        await sleep(0);
-        assertGreaterThan(initA.mock.callCount(), 0);
-        assertSame(initX.mock.callCount(), 0);
-        assertSame(destroyA.mock.callCount(), 0);
-        assertSame(destroyX.mock.callCount(), 1);
-        assertSame(root.innerHTML, "<!--<>-->A<!--</>-->");
-        initA.mock.resetCalls();
-        destroyX.mock.resetCalls();
+    it("renders the first Otherwise branch when no test matches", () => {
+        const node = render(
+            <Choose>
+                <When test={false}>A</When>
+                <Otherwise><span>X</span></Otherwise>
+                <Otherwise><span>Y</span></Otherwise>
+            </Choose>
+        );
 
-        value.set(1);
-        await sleep(0);
-        assertSame(initA.mock.callCount(), 0);
-        assertSame(initX.mock.callCount(), 1);
-        assertSame(destroyA.mock.callCount(), 1);
-        assertSame(destroyX.mock.callCount(), 0);
-        assertSame(root.innerHTML, "<!--<>-->X<!--</>-->");
+        assertInstanceOf(node, HTMLSpanElement);
+        assertSame(node.textContent, "X");
+    });
+
+    it("renders the Otherwise branch when it is the only child", () => {
+        const node = render(
+            <Choose>
+                <Otherwise><span>X</span></Otherwise>
+            </Choose>
+        );
+
+        assertInstanceOf(node, HTMLSpanElement);
+        assertSame(node.textContent, "X");
+    });
+
+    it("renders an empty branch when Otherwise has no children", () => {
+        const node = render(
+            <Choose>
+                <Otherwise />
+            </Choose>
+        );
+
+        assertInstanceOf(node, DocumentFragment);
+        assertSame(node.textContent, "");
+    });
+
+    it("renders an empty branch when Choose has no children", () => {
+        const node = render(<Choose />);
+
+        assertInstanceOf(node, DocumentFragment);
+        assertSame(node.textContent, "");
+    });
+
+    it("renders an empty branch when no test matches and Otherwise is omitted", () => {
+        const node = render(
+            <Choose>
+                <When test={false}>A</When>
+            </Choose>
+        );
+
+        assertInstanceOf(node, DocumentFragment);
+        assertSame(node.textContent, "");
+    });
+
+    it("switches reactively between the first matching branch and Otherwise", () => {
+        const [ value, setValue ] = createSignal(0);
+        const node = render(
+            <div>
+                <Choose>
+                    <When test={() => value() < 1}>A</When>
+                    <When test={() => value() < 2}>B</When>
+                    <When test={() => value() < 3}>C</When>
+                    <Otherwise>X</Otherwise>
+                </Choose>
+            </div>
+        );
+
+        assertSame(node.textContent, "A");
+        setValue(1);
+        assertSame(node.textContent, "B");
+        setValue(2);
+        assertSame(node.textContent, "C");
+        setValue(3);
+        assertSame(node.textContent, "X");
+        setValue(0);
+        assertSame(node.textContent, "A");
+    });
+
+    it("stops testing after the first matching branch", () => {
+        const [ first, setFirst ] = createSignal(true);
+        const [ second, setSecond ] = createSignal(true);
+        let secondRuns = 0;
+        const node = render(
+            <div>
+                <Choose>
+                    <When test={first}>A</When>
+                    <When test={() => {
+                        secondRuns++;
+                        return second();
+                    }}>B</When>
+                    <Otherwise>X</Otherwise>
+                </Choose>
+            </div>
+        );
+
+        assertSame(node.textContent, "A");
+        assertSame(secondRuns, 0);
+
+        setSecond(false);
+        assertSame(node.textContent, "A");
+        assertSame(secondRuns, 0);
+
+        setFirst(false);
+        assertSame(node.textContent, "X");
+        assertSame(secondRuns, 1);
+
+        setSecond(true);
+        assertSame(node.textContent, "B");
+        assertSame(secondRuns, 2);
+    });
+
+    it("materializes only the selected branch and disposes it when the selection changes", () => {
+        const [ showA, setShowA ] = createSignal(true);
+        let createdA = 0;
+        let disposedA = 0;
+        let createdX = 0;
+        let disposedX = 0;
+
+        function A(props: NoProps, context: ComponentContext) {
+            createdA++;
+            context.onDispose(() => {
+                disposedA++;
+            });
+            return <span>A</span>;
+        }
+
+        function X(props: NoProps, context: ComponentContext) {
+            createdX++;
+            context.onDispose(() => {
+                disposedX++;
+            });
+            return <span>X</span>;
+        }
+
+        const node = render(
+            <div>
+                <Choose>
+                    <When test={showA}><A /></When>
+                    <Otherwise><X /></Otherwise>
+                </Choose>
+            </div>
+        );
+
+        assertSame(node.textContent, "A");
+        assertSame(createdA, 1);
+        assertSame(disposedA, 0);
+        assertSame(createdX, 0);
+        assertSame(disposedX, 0);
+
+        setShowA(false);
+        assertSame(node.textContent, "X");
+        assertSame(createdA, 1);
+        assertSame(disposedA, 1);
+        assertSame(createdX, 1);
+        assertSame(disposedX, 0);
+
+        setShowA(true);
+        assertSame(node.textContent, "A");
+        assertSame(createdA, 2);
+        assertSame(disposedA, 1);
+        assertSame(createdX, 1);
+        assertSame(disposedX, 1);
+
+        dispose(node);
+        assertSame(disposedA, 2);
+        assertSame(disposedX, 1);
+    });
+
+    it("returns branch children when marker components are called directly", () => {
+        assertSame(When({ test: true, children: "A" }), "A");
+        assertSame(When({ test: false }), null);
+        assertSame(Otherwise({ children: "X" }), "X");
+        assertSame(Otherwise({}), null);
     });
 });

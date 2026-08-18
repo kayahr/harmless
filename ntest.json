@@ -9,6 +9,5 @@
         "enabled": true
     },
     "sourceMaps": true,
-    "exposeGC": true,
-    "import": [ "./lib/test/dom.js" ]
+    "exposeGC": true
 }

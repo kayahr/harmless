@@ -33,8 +33,10 @@
     "scripts": {
         "clean": "rm -rf lib",
         "build": "run build:*",
-        "build:compile": "tsc",
+        "build:importmap": "importmap-node-module lib/importmap.js",
+        "build:compile": "rm -rf lib/main lib/test lib/demo && tsc",
         "test": "run test:*",
+        "pretest:unit": "npm run build:compile",
         "test:unit": "ntest",
         "test:lint": "oxlint --type-aware --deny-warnings",
         "test:apidoc": "typedoc --emit none",
@@ -44,6 +46,7 @@
     },
     "devDependencies": {
         "@happy-dom/global-registrator": "20.11.2",
+        "@jsenv/importmap-node-module": "7.3.0",
         "@kayahr/assert": "1.5.0",
         "@kayahr/cspell": "10.0.1-bundle.2",
         "@kayahr/npm-utils": "1.1.2",
@@ -54,8 +57,9 @@
         "typescript": "7.0.2"
     },
     "dependencies": {
-        "@kayahr/cdi": "^0.3.1",
+        "@kayahr/di": "^1.0.0",
         "@kayahr/observable": "^1.2.0",
-        "@kayahr/signal": "^4.2.0"
+        "@kayahr/scope": "^1.2.0",
+        "@kayahr/signal": "^6.1.1"
     }
 }

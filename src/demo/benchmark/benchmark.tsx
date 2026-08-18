@@ -1,5 +1,6 @@
-import { For, type JSX, render } from "@kayahr/harmless";
-import { type WritableSignal, arraySignal, atomic, signal } from "@kayahr/signal";
+import { For, render } from "@kayahr/harmless";
+import { type Getter, type Setter, batch, createArraySignal, createSignal } from "@kayahr/signal";
+import type { JSX } from "../../main/jsx.ts";
 
 const adjectives = [
     "pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful",
@@ -14,47 +15,49 @@ let nextId = 1;
 
 interface Data {
     id: number;
-    label: WritableSignal<string>;
+    label: Getter<string>;
+    setLabel: Setter<string>;
 }
 
 const buildData = (count: number) => {
     const data = Array.from<Data>({ length: count });
     for (let i = 0; i < count; i++) {
-        const label = signal(
+        const [ label, setLabel ] = createSignal(
             `${adjectives[random(adjectives.length)]} ${colors[random(colors.length)]} ${nouns[random(nouns.length)]}`
         );
-        data[i] = { id: nextId++, label };
+        data[i] = { id: nextId++, label, setLabel };
     }
     return data;
 };
 
 const Button = ({ id, children, fn }: { id: string, children: JSX.Element, fn: () => unknown }) => (
     <div class="col-sm-6 smallpad">
-        <button id={id} class="btn btn-primary btn-block" type="button" onclick={fn}>
+        <button id={id} class="btn btn-primary btn-block" type="button" on:click={fn}>
             {children}
         </button>
     </div>
 );
 
 document.getElementById("main")?.appendChild(render(() => {
-    const data = arraySignal<Data>([]);
-    const selected = signal<number | null>(null);
-    const run = () => data.set(buildData(1_000));
-    const runLots = () => data.set(buildData(10_000));
-    const add = () => data.push(...buildData(1_000));
+    const [ data, array ] = createArraySignal<Data>([]);
+    const [ selected, setSelected ] = createSignal<number | null>(null);
+    const run = () => array.replace(buildData(1_000));
+    const runLots = () => array.replace(buildData(10_000));
+    const add = () => array.push(...buildData(1_000));
     const update = () =>
-        atomic(() => {
-            for (let i = 0, d = data.get(), len = d.length; i < len; i += 10) {
-                d[i]?.label.update(l => `${l} !!!`);
+        batch(() => {
+            for (let i = 0, d = data(), len = d.length; i < len; i += 10) {
+                d[i]?.setLabel(l => `${l} !!!`);
             }
         });
-    const clear = () => data.set([]);
+    const clear = () => array.replace([]);
     const swapRows = () => {
-        if (data.length > 998) {
-            const item = data.at(1)!;
-            atomic(() => {
-                data.setAt(1, data.at(998)!);
-                data.setAt(998, item);
+        const items = data();
+        if (items.length > 998) {
+            const item = items.at(1)!;
+            batch(() => {
+                array.set(1, items.at(998)!);
+                array.set(998, item);
             });
         }
     };
@@ -80,17 +83,18 @@ document.getElementById("main")?.appendChild(render(() => {
             </div>
             <table class="table table-hover table-striped test-data">
                 <tbody>
-                    <For each={data}>
+                    <For of={data} key={item => item.id}>
                         {row => {
-                            const rowId = row.id;
+                            const item = row();
+                            const rowId = item.id;
                             return (
-                                <tr class={() => selected.get() === rowId ? "danger" : ""}>
+                                <tr class={() => selected() === rowId ? "danger" : ""}>
                                     <td class="col-md-1">{rowId}</td>
                                     <td class="col-md-4">
-                                        <a onclick={() => selected.set(rowId)}>{row.label}</a>
+                                        <a on:click={() => setSelected(rowId)}>{item.label}</a>
                                     </td>
                                     <td class="col-md-1">
-                                        <a onclick={() => data.splice(data.findIndex(d => d.id === rowId), 1)}>
+                                        <a on:click={() => array.splice(data().findIndex(d => d.id === rowId), 1)}>
                                             <span class="glyphicon glyphicon-remove" aria-hidden="true" />
                                         </a>
                                     </td>

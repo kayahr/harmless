@@ -1,29 +1,27 @@
 /*
- * Copyright (C) 2024 Klaus Reimer <k@ailis.de>
- * See LICENSE.md for licensing information
+ * Copyright (C) 2026 Klaus Reimer
+ * SPDX-License-Identifier: MIT
  */
 
-import { Route, RouteParams, Routes } from "../../main/components/Route.ts";
-import { component } from "../../main/utils/component.ts";
-import { render } from "../../main/utils/render.ts";
+import { A, Route, Routes, render, routeParams } from "@kayahr/harmless";
 
-function User(props: unknown, params: RouteParams<{ id: string }>) {
-    return <div>User {() => params.get().id}</div>;
+function User() {
+    return <h1>User {() => routeParams().id}</h1>;
 }
-component(User, { inject: [ RouteParams ] });
 
-document.body.appendChild(render(<>
-    <div>
-      <Routes>
-        <Route path="/">Root</Route>
-        <Route path="/users">Users</Route>
-        <Route path="/user/:id"><User /></Route>
-      </Routes>
-    </div>
-    <ul>
-      <li><a href="#/">Root</a></li>
-      <li><a href="#/users">Users</a></li>
-      <li><a href="#/user/1234">User 1234</a></li>
-      <li><a href="#/user/555">User 555</a></li>
-    </ul>
+document.body.append(render(<>
+  <nav>
+    <A href="/" activeClass="active">Home</A>
+    {" | "}
+    <A href="/users" activeClass="active">Users</A>
+    {" | "}
+    <A href="/users/42" activeClass="active">User 42</A>
+    {" | "}
+    <A href="/users/Arthur%20Dent" activeClass="active">Arthur Dent</A>
+  </nav>
+  <Routes>
+    <Route path="/"><h1>Home</h1></Route>
+    <Route path="/users"><h1>Users</h1></Route>
+    <Route path="/users/:id"><User /></Route>
+  </Routes>
 </>));

@@ -3,7 +3,7 @@
  * See LICENSE.md for licensing information
  */
 
-import { render } from "../../main/utils/render.ts";
+import { render } from "@kayahr/harmless";
 
 // Most simple example which just outputs a static text
 

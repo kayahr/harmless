@@ -1,63 +1,88 @@
 /*
- * Copyright (C) 2024 Klaus Reimer <k@ailis.de>
- * See LICENSE.md for licensing information
+ * Copyright (C) 2026 Klaus Reimer
+ * SPDX-License-Identifier: MIT
  */
 
 import { describe, it } from "node:test";
-
-import type { ComponentClass } from "../main/ClassComponent.ts";
-import { Choose, Otherwise, When, type WhenProperties } from "../main/components/Choose.ts";
-import { For, type ForProperties } from "../main/components/For.ts";
-import { If, type IfProperties } from "../main/components/If.ts";
-import { A, type AProperties, Route, type RouteParams, type RouteProperties, Routes } from "../main/components/Route.ts";
-import { Show, type ShowProperties } from "../main/components/Show.ts";
-import { Context } from "../main/Context.ts";
+import { assertAssignable, assertEquals } from "@kayahr/assert";
 import * as exports from "../main/index.ts";
-import { JSXElement } from "../main/JSXElement.ts";
-import { type ComponentOptions, component } from "../main/utils/component.ts";
-import { onDestroy } from "../main/utils/lifecycle.ts";
-import { Reference, ref } from "../main/utils/Reference.ts";
-import { render } from "../main/utils/render.ts";
-import type { Element, ElementObject  } from "../main/utils/types.ts";
-import { assertEquals } from "@kayahr/assert";
+import { type ComponentDependencies, type ComponentDependency, component } from "../main/component.ts";
+import { Choose, type ChooseProps, Otherwise, type OtherwiseProps, When, type WhenProps } from "../main/components/Choose.ts";
+import { For, type ForKey, type ForProps } from "../main/components/For.ts";
+import { If, type IfProps } from "../main/components/If.ts";
+import {
+    A,
+    type AProps,
+    Route,
+    type RouteParameterValues,
+    type RouteProps,
+    Routes,
+    type RoutesProps,
+    routeParams
+} from "../main/components/Route.tsx";
+import {
+    type ClassValue,
+    type Component,
+    type ComponentClass,
+    ComponentContext,
+    type ComponentContextToken,
+    type ComponentFunction,
+    type ComponentInstance,
+    type IntrinsicProps,
+    type JSX,
+    type JSXNode,
+    type Key,
+    type NoProps,
+    type ParentProps,
+    type Primitive
+} from "../main/jsx.ts";
+import type { Rendered } from "../main/rendered/Rendered.ts";
+import { type RenderedNode, render } from "../main/render.ts";
 
 describe("index", () => {
     it("exports relevant types and functions and nothing more", () => {
-        // Checks if runtime includes the expected exports and nothing else
         assertEquals({ ...exports }, {
-            component,
-            JSXElement,
-            Show,
+            A,
+            Choose,
+            ComponentContext,
             For,
+            If,
+            Otherwise,
             Route,
             Routes,
-            A,
-            If,
-            onDestroy,
-            ref,
-            Context,
-            Reference,
-            render,
             When,
-            Choose,
-            Otherwise
+            component,
+            render,
+            routeParams
         });
 
-        // Interfaces and types can only be checked by TypeScript
-        ((): ShowProperties => (({} as exports.ShowProperties)))();
-        ((): ForProperties => (({} as exports.ForProperties)))();
-        ((): ComponentOptions => (({} as exports.ComponentOptions)))();
-        ((): WhenProperties => (({} as exports.WhenProperties)))();
-        ((): AProperties => (({} as exports.AProperties)))();
-        ((): ComponentClass => (({} as exports.ComponentClass)))();
-        ((): ElementObject => ((0 as unknown as exports.ElementObject)))();
-        ((): IfProperties => (({} as exports.IfProperties)))();
-        ((): RouteParams => (({} as exports.RouteParams)))();
-        ((): RouteProperties => (({} as exports.RouteProperties)))();
-
-        const a: exports.Element = {};
-        void ((): Element => a)();
-        const b: exports.JSX.Element = {};
-        void ((): Element => b)();
+        assertAssignable<AProps, exports.AProps>();
+        assertAssignable<ChooseProps, exports.ChooseProps>();
+        assertAssignable<ClassValue, exports.ClassValue>();
+        assertAssignable<Component<{ value: number }>, exports.Component<{ value: number }>>();
+        assertAssignable<ComponentClass<{ value: number }>, exports.ComponentClass<{ value: number }>>();
+        assertAssignable<ComponentDependencies<[ number ]>, exports.ComponentDependencies<[ number ]>>();
+        assertAssignable<ComponentDependency<number>, exports.ComponentDependency<number>>();
+        assertAssignable<ComponentContext, exports.ComponentContext>();
+        assertAssignable<ComponentContextToken, exports.ComponentContextToken>();
+        assertAssignable<ComponentFunction<{ value: number }>, exports.ComponentFunction<{ value: number }>>();
+        assertAssignable<ComponentInstance, exports.ComponentInstance>();
+        assertAssignable<ForKey<{ id: number }>, exports.ForKey<{ id: number }>>();
+        assertAssignable<ForProps<{ id: number }>, exports.ForProps<{ id: number }>>();
+        assertAssignable<IfProps, exports.IfProps>();
+        assertAssignable<IntrinsicProps, exports.IntrinsicProps>();
+        assertAssignable<JSX.Element, exports.JSX.Element>();
+        assertAssignable<JSXNode<{ value: number }>, exports.JSXNode<{ value: number }>>();
+        assertAssignable<Key, exports.Key>();
+        assertAssignable<NoProps, exports.NoProps>();
+        assertAssignable<OtherwiseProps, exports.OtherwiseProps>();
+        assertAssignable<ParentProps, exports.ParentProps>();
+        assertAssignable<Primitive, exports.Primitive>();
+        assertAssignable<Rendered, exports.Rendered>();
+        assertAssignable<RenderedNode, exports.RenderedNode>();
+        assertAssignable<RouteParameterValues, exports.RouteParameterValues>();
+        assertAssignable<RouteProps, exports.RouteProps>();
+        assertAssignable<RoutesProps, exports.RoutesProps>();
+        assertAssignable<WhenProps, exports.WhenProps>();
     });
 });

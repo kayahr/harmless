@@ -1,7 +1,0 @@
----
-title: Choose
----
-
-# Choose
-
-TODO

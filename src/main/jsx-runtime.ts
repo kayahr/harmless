@@ -1,8 +1,6 @@
 /*
- * Copyright (C) 2024 Klaus Reimer <k@ailis.de>
- * See LICENSE.md for licensing information.
+ * Copyright (C) 2026 Klaus Reimer
+ * SPDX-License-Identifier: MIT
  */
 
-export { Fragment } from "./FragmentElement.ts";
-export { type JSX } from "./JSX.ts";
-export { jsx, jsxDEV, jsxs } from "./jsxFactory.ts";
+export { Fragment, jsx, jsxDEV, jsxs, type JSX } from "./jsx.ts";

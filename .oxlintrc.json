@@ -7,7 +7,7 @@
         "node": true,
         "browser": true
     },
-    "overrides": [
+     "overrides": [
         {
             "files": [
                 "src/demo/**/*",
@@ -17,5 +17,8 @@
                 "jsx-a11y/control-has-associated-label": "off"
             }
         }
-    ]
+    ],
+    "rules": {
+    "eslint/one-var": "off"
+    }
 }

@@ -1,29 +1,27 @@
 /*
- * Copyright (C) 2025 Klaus Reimer <k@ailis.de>
- * See LICENSE.md for licensing information
+ * Copyright (C) 2026 Klaus Reimer
+ * SPDX-License-Identifier: MIT
  */
 
-import {  signal } from "@kayahr/signal";
+import { Choose, Otherwise, When, render } from "@kayahr/harmless";
+import { createSignal } from "@kayahr/signal";
 
-import { Choose, Otherwise, When } from "../../main/components/Choose.ts";
-import { render } from "../../main/utils/render.ts";
-
-function Root() {
-    const value = signal(1);
+function App() {
+    const [ value, setValue ] = createSignal(1);
 
     return <>
-        <button onclick={() => value.update(e => e + 1)}>Increment</button>
-        <button onclick={() => value.update(e => e - 1)}>Decrement</button>
+        <button on:click={() => setValue(value => value + 1)}>Increment</button>
+        <button on:click={() => setValue(value => value - 1)}>Decrement</button>
         <br />
         <Choose>
-            <When test={() => value.get() >= 5}>When 5</When>
-            <When test={() => value.get() >= 4}>When 4</When>
-            <When test={() => value.get() >= 3}>When 3</When>
-            <When test={() => value.get() >= 2}>When 2</When>
-            <When test={() => value.get() >= 1}>When 1</When>
-            <Otherwise>Otherwise Text!</Otherwise>
+            <When test={() => value() >= 5}>At least 5</When>
+            <When test={() => value() >= 4}>At least 4</When>
+            <When test={() => value() >= 3}>At least 3</When>
+            <When test={() => value() >= 2}>At least 2</When>
+            <When test={() => value() >= 1}>At least 1</When>
+            <Otherwise>Less than 1</Otherwise>
         </Choose>
     </>;
-};
+}
 
-document.body.appendChild(render(<Root />));
+document.body.appendChild(render(<App />));
