@@ -12,8 +12,9 @@ A minimalistic reactive web frontend framework written in TypeScript.
 * Supports native HTML, SVG and MathML elements with reactive properties, attributes and styles.
 * Provides built-in components for flow control, like [If], [Choose] and [Route].
 * Provides keyed list rendering with [For].
+* Easily testable with any testing framework.
 * It's just a library without any build system requirements. Use whatever you like.
-* Easily testable with any JSX-capable testing framework (like [Vitest]).
+* No dependency nightmare. The only dependencies are four companion packages for [DI], [observables], [signals] and [scopes].
 
 Some features are intentionally missing to keep Harmless small, focused and... well... harmless:
 
@@ -66,6 +67,8 @@ See the [documentation] for more details.
 [NPM]: https://www.npmjs.com/package/@kayahr/harmless
 [Vitest]: https://vitest.dev/
 [signal]: https://www.npmjs.com/package/@kayahr/signal
+[signals]: https://www.npmjs.com/package/@kayahr/signal
+[scopes]: https://www.npmjs.com/package/@kayahr/scope
 [DI]: https://www.npmjs.com/package/@kayahr/di
 [promises]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [observables]: https://www.npmjs.com/package/@kayahr/observable
