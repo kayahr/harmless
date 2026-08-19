@@ -67,6 +67,8 @@ npx esbuild --bundle --outfile=bundle/app.js lib/app.js
 
 Alternatively you can use any other packaging tool, like [Parcel], [Rollup], [Vite] or [Webpack]. No special Harmless plugin is needed and the packaging tool does not even need to know about JSX because the TypeScript compiler has already transformed it.
 
+Bundling is optional. A Harmless application can also load the JavaScript files emitted by TypeScript directly as ES modules in the browser. [@kayahr/importmap] can generate the required import map from the installed NPM dependencies so the browser can resolve their package imports to files in `node_modules`. The [src/demo](https://github.com/kayahr/harmless/tree/main/src/demo) directory contains demos which use exactly this setup.
+
 ## Usage with JavaScript
 
 There are many ways to use Harmless and JSX without TypeScript. One proven way is [esbuild] with its automatic JSX runtime, assuming the application entry point is `src/app.jsx`:
@@ -123,6 +125,7 @@ Disposal releases the owned resources but intentionally does not remove an alrea
 * [Signals](./signals.md)
 
 [Babel]: https://babeljs.io/
+[@kayahr/importmap]: https://www.npmjs.com/package/@kayahr/importmap
 [esbuild]: https://esbuild.github.io/
 [Parcel]: https://parceljs.org/
 [Rollup]: https://rollupjs.org/
