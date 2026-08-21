@@ -57,6 +57,27 @@ When only the parameter values of the same `Route` change, Harmless keeps that r
 
 `routeParams()` is global because a browser document has one current hash and therefore one active route. Use one `Routes` component for the application's route selection.
 
+## Wildcard Parameters
+
+A final path segment beginning with `*` matches the complete remaining path, including additional slash-separated segments. Add a name after `*` to expose the captured remainder as a route parameter:
+
+```tsx
+<Route path="/files/*path"><File /></Route>
+```
+
+This route matches `/files`, `/files/images` and `/files/images/logo.svg`. The last path produces `{ path: "images/logo.svg" }`, while `path` is `undefined` when `/files` has no remaining path. Wildcard values are URL-decoded like other route parameters.
+
+An anonymous `*` performs the same match without adding a parameter. It is useful as the final route for rendering a fallback page:
+
+```tsx
+<Routes>
+    <Route path="/">Home</Route>
+    <Route path="*">Page not found</Route>
+</Routes>
+```
+
+A wildcard must be the final path segment. Because `Routes` selects the first matching route, declare a general fallback after all more specific routes.
+
 ## Route Matching
 
 A route path must match the complete hash path. Literal characters are matched literally and required parameters must contain at least one character. When several routes could match, their declaration order decides which one is selected.

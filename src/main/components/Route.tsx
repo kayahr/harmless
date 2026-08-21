@@ -25,7 +25,7 @@ export type RoutesProps = ParentProps;
 
 /** Props accepted by {@link Route}. */
 export interface RouteProps extends ParentProps {
-    /** Exact route path with optional `:name` and `:name?` parameter segments. */
+    /** Route path with `:name`, `:name?`, `*name`, and anonymous `*` parameter segments. */
     path: string;
 }
 
@@ -122,7 +122,22 @@ function escapeRegExp(value: string): string {
  */
 function createPathPattern(path: string): PathPattern {
     const parameterNames: string[] = [];
-    const source = normalizePath(path).split("/").slice(1).map(segment => {
+    const segments = normalizePath(path).split("/").slice(1);
+    const source = segments.map((segment, index) => {
+        if (segment.startsWith("*")) {
+            if (index !== segments.length - 1) {
+                throw new TypeError("Route wildcard must be the final segment");
+            }
+            const name = segment.slice(1);
+            if (name.length === 0) {
+                return "(?:/.*)?";
+            }
+            if (parameterNames.includes(name)) {
+                throw new TypeError(`Duplicate route parameter: ${name}`);
+            }
+            parameterNames.push(name);
+            return "(?:/(.*))?";
+        }
         if (!segment.startsWith(":")) {
             return `/${escapeRegExp(segment)}`;
         }

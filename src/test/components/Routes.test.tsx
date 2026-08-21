@@ -129,6 +129,32 @@ describe("Routes", () => {
         dispose(node);
     });
 
+    it("matches named and anonymous wildcard parameters", async () => {
+        await navigate("#/users/42/profile/Arthur%20Dent/details");
+        const node = render(
+            <div>
+                <Routes>
+                    <Route path="/users/:id/*rest">
+                        <span>{() => `${routeParams().id}:${routeParams().rest ?? "-"}`}</span>
+                    </Route>
+                    <Route path="*">
+                        <span>{() => `Fallback:${Object.keys(routeParams()).length}`}</span>
+                    </Route>
+                </Routes>
+            </div>
+        );
+
+        assertSame(node.textContent, "42:profile/Arthur Dent/details");
+
+        await navigate("#/users/42");
+        assertSame(node.textContent, "42:-");
+
+        await navigate("#/missing/path");
+        assertSame(node.textContent, "Fallback:0");
+
+        dispose(node);
+    });
+
     it("matches regular-expression characters in literal path segments literally", async () => {
         await navigate("#/docs/a+b.html");
         const node = render(
@@ -143,7 +169,7 @@ describe("Routes", () => {
         dispose(node);
     });
 
-    it("rejects empty and duplicate route parameter names", () => {
+    it("rejects empty and duplicate route parameter names and non-final wildcards", () => {
         assertThrowWithMessage(
             () => render(<Routes><Route path="/:">Invalid</Route></Routes>),
             TypeError,
@@ -153,6 +179,11 @@ describe("Routes", () => {
             () => render(<Routes><Route path="/:id/:id">Invalid</Route></Routes>),
             TypeError,
             "Duplicate route parameter: id"
+        );
+        assertThrowWithMessage(
+            () => render(<Routes><Route path="/*rest/trailing">Invalid</Route></Routes>),
+            TypeError,
+            "Route wildcard must be the final segment"
         );
     });
 
