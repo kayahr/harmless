@@ -7,8 +7,8 @@ For simplicity the demos in this directory are not using a web bundler. Instead 
 
 There are many ways to do this. One is this:
 
-* Run `npx local-web-server` in the project root directory.
-* Open the demo (for example: http://127.0.0.1:8000/src/demo/hello-world/) in your browser.
+* Run `npx node-http-server` in the project root directory.
+* Open the demo (for example: http://127.0.0.1:8080/src/demo/hello-world/) in your browser.
 
 
 ## Enable file access in Chrome
